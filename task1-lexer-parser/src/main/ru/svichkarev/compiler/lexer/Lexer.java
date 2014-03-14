@@ -52,6 +52,16 @@ public class Lexer {
 			break;
 		case '-':
 			currentToken = new Token<String>( TokenType.MINUS, "-" ); // TODO: почему так?
+			break;
+		case '*':
+			currentToken = new Token<String>( TokenType.MULTIPLICATION, "*" ); // TODO: почему так?
+			break;
+		case '/':
+			currentToken = new Token<String>( TokenType.DIVISION, "/" ); // TODO: почему так?
+			break;
+		case '^':
+			currentToken = new Token<String>( TokenType.EXPONENTIATION, "^" ); // TODO: почему так?
+			break;
 		default:
 			// цифра или число возможно
 			if( Character.isDigit( curChar ) ){
@@ -64,7 +74,9 @@ public class Lexer {
 	
 	// если это разделительный символ, то проматываем
 	private void readThroughSpacesAndComments(){
-		// TODO: потом реализую
+		while( Character.isSpaceChar( peekCharFromBuffer() ) ){
+			buffer.getChar();
+		}
 	}
 	
 	private Token<Integer> getNumberFromBuffer( char curChar ) {

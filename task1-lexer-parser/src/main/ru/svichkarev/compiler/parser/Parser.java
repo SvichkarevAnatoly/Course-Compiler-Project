@@ -15,10 +15,11 @@ public class Parser {
 		int result = parseTerm();
 		
 		int secondTerm = 0;
-		Token<?> curToken = lexer.getToken();
+		Token<?> curToken = lexer.peekToken();
 		while( Lexer.match( curToken, TokenType.PLUS ) ||
 				Lexer.match( curToken, TokenType.MINUS ) ){
 			
+			lexer.getToken();
 			secondTerm = parseTerm();
 			switch( curToken.getTokenType() ) {
 			case PLUS:
@@ -31,7 +32,7 @@ public class Parser {
 				break;
 			}
 			
-			curToken = lexer.getToken();
+			curToken = lexer.peekToken();
 		}
 		
 		return result;
@@ -41,10 +42,11 @@ public class Parser {
 		int result = parseFactor();
 		
 		int secondFactor = 0;
-		Token<?> curToken = lexer.getToken();
+		Token<?> curToken = lexer.peekToken();
 		while( Lexer.match( curToken, TokenType.MULTIPLICATION ) ||
 				Lexer.match( curToken, TokenType.DIVISION ) ){
 			
+			lexer.getToken();
 			secondFactor = parseFactor();
 			switch( curToken.getTokenType() ) {
 			case MULTIPLICATION:
@@ -57,7 +59,7 @@ public class Parser {
 				break;
 			}
 			
-			curToken = lexer.getToken();
+			curToken = lexer.peekToken();
 		}
 		
 		return result;
@@ -70,7 +72,7 @@ public class Parser {
 		if( Lexer.match( curToken, TokenType.EXPONENTIATION ) ){
 			lexer.getToken(); // пропускаем знак ^
 			int secondPower = parseFactor();
-			result ^= secondPower;
+			result = (int) Math.pow( result, secondPower ); // TODO: Так нельзя! нужна нормальная целочисленная функция
 		}
 		
 		return result;

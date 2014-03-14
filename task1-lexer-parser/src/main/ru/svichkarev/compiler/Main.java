@@ -8,7 +8,7 @@ import main.ru.svichkarev.compiler.parser.Parser;
 
 public final class Main {
 	public static void main(String[] args) {
-		Buffer buffer = new Buffer( new StringReader("5+5+101-54-100"), 5 );
+		Buffer buffer = new Buffer( new StringReader("   3  ^2 +-9+5*7-100"), 5 );
 		Lexer lexer = new Lexer( buffer );
 		Parser parser = new Parser( lexer );
 		
