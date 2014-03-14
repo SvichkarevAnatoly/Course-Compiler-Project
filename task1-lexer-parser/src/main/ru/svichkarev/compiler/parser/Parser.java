@@ -99,14 +99,11 @@ public class Parser {
 		
 		Token<?> token = lexer.getToken();
 		if( Lexer.match( token, TokenType.BRACKET_OPEN ) ){
+			result = parseExpr();
 			token = lexer.getToken();
-			if( Lexer.match( token, TokenType.NUMBER ) ){
-				token = lexer.getToken();
-				result = (Integer) token.getTokenValue();
-				if( Lexer.match( token, TokenType.BRACKET_CLOSE ) ){
-					return result;
-				}
-			} else{
+			if( Lexer.match( token, TokenType.BRACKET_CLOSE ) ){
+				return result;
+			}else{
 				// TODO: кинуть ошибку
 			}
 		} else{

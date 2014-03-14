@@ -62,6 +62,12 @@ public class Lexer {
 		case '^':
 			currentToken = new Token<String>( TokenType.EXPONENTIATION, "^" ); // TODO: почему так?
 			break;
+		case '(':
+			currentToken = new Token<String>( TokenType.BRACKET_OPEN, "(" ); // TODO: почему так?
+			break;
+		case ')':
+			currentToken = new Token<String>( TokenType.BRACKET_CLOSE, ")" ); // TODO: почему так?
+			break;
 		default:
 			// цифра или число возможно
 			if( Character.isDigit( curChar ) ){
