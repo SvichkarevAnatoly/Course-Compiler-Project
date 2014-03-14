@@ -5,7 +5,7 @@ import static org.junit.Assert.fail;
 
 import java.io.StringReader;
 
-import main.Buffer;
+import main.ru.svichkarev.compiler.buffer.Buffer;
 
 import org.junit.Test;
 
@@ -16,9 +16,9 @@ public class BufferTest {
 	@Test
 	public void test() {
 		
-		Buffer buffer = new Buffer(new StringReader("SDFSDFFADFASDFASDF")); 
+		Buffer buffer = new Buffer( new StringReader("SDFSDFFADFASDFASDF") ); 
 		
-		assertEquals('A',buffer.getChar());
+		assertEquals( 'A', buffer.getChar() );
 		
 	}
 
