@@ -38,14 +38,81 @@ public class Parser {
 	}
 	
 	public int parseTerm(){
-		//TODO: Простой вариант сразу atom и только int
-		int result = 0;
-		Token<?> token = lexer.getToken();
+		int result = parseFactor();
 		
-		if( Lexer.match( token, TokenType.NUMBER ) ){
-			result = (Integer) token.getTokenValue();
+		int secondFactor = 0;
+		Token<?> curToken = lexer.getToken();
+		while( Lexer.match( curToken, TokenType.MULTIPLICATION ) ||
+				Lexer.match( curToken, TokenType.DIVISION ) ){
+			
+			secondFactor = parseFactor();
+			switch( curToken.getTokenType() ) {
+			case MULTIPLICATION:
+				result *= secondFactor;
+				break;
+			case DIVISION:
+				result /= secondFactor;
+				break;
+			default:
+				break;
+			}
+			
+			curToken = lexer.getToken();
+		}
+		
+		return result;
+	}
+	
+	public int parseFactor(){
+		int result = parsePower();
+		
+		Token<?> curToken = lexer.peekToken();
+		if( Lexer.match( curToken, TokenType.EXPONENTIATION ) ){
+			lexer.getToken(); // пропускаем знак ^
+			int secondPower = parseFactor();
+			result ^= secondPower;
+		}
+		
+		return result;
+	}
+	
+	public int parsePower(){
+		int result;
+		int sign = 1;
+		
+		Token<?> curToken = lexer.peekToken();
+		// если унарный минус
+		if( Lexer.match( curToken, TokenType.MINUS ) ){
+			lexer.getToken(); // пропускаем -
+			sign = -1;
+		}
+		result = parseAtom();
+		
+		return result * sign;
+	}
+	
+	public int parseAtom(){
+		//TODO: Простой вариант - только int
+		int result = 0; // TODO: убрать инициализацию
+		
+		Token<?> token = lexer.getToken();
+		if( Lexer.match( token, TokenType.BRACKET_OPEN ) ){
+			token = lexer.getToken();
+			if( Lexer.match( token, TokenType.NUMBER ) ){
+				token = lexer.getToken();
+				result = (Integer) token.getTokenValue();
+				if( Lexer.match( token, TokenType.BRACKET_CLOSE ) ){
+					return result;
+				}
+			} else{
+				// TODO: кинуть ошибку
+			}
 		} else{
-			// TODO: кинуть ошибку
+			if( Lexer.match( token, TokenType.NUMBER ) ){
+				result = (Integer) token.getTokenValue();
+			} else{
+				// TODO: кинуть ошибку
+			}
 		}
 		
 		return result;

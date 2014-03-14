@@ -4,9 +4,8 @@ import main.ru.svichkarev.compiler.buffer.Buffer;
 
 public class Lexer {
 	private Buffer buffer;
-
-	// TODO: аккумулятор текущей строки токена
-	private String curTokenString;
+	
+	private Token<?> currentToken = null;
 	
 	// TODO: куча всяких флажков
 	private boolean isEndSourseCode = false;
@@ -15,37 +14,52 @@ public class Lexer {
 		this.buffer = buffer;
 	}
 	
-	public Token getToken(){
-		Token result = null; // TODO: убрать null
+	public Token<?> peekToken() {
+		if( currentToken == null ){
+			makeToken();
+		}
 		
+		return currentToken;
+	}
+	
+	public Token<?> getToken(){
+		if( currentToken == null ){
+			makeToken();
+		}
+		Token<?> result = currentToken;
+		makeToken();
+		
+		return result;
+	}
+
+	// сравнивает токен с известным типом
+	public static boolean match( Token<?> token, TokenType etalon ){
+		return (token.getTokenType() == etalon);
+	}
+	
+	// считывает токен и пишет в поле текущего токена
+	private void makeToken(){
 		if( isEndSourseCode ){
-			result = new Token<String>( TokenType.END , "End" );
-			return result;
+			currentToken = new Token<String>( TokenType.END , "End" );
+			return;
 		}
 		
 		readThroughSpacesAndComments();
 		char curChar = buffer.getChar();
 		switch (curChar) {
 		case '+':
-			result = new Token<String>( TokenType.PLUS, "+" ); // TODO: почему так?
+			currentToken = new Token<String>( TokenType.PLUS, "+" ); // TODO: почему так?
 			break;
 		case '-':
-			result = new Token<String>( TokenType.MINUS, "-" ); // TODO: почему так?
+			currentToken = new Token<String>( TokenType.MINUS, "-" ); // TODO: почему так?
 		default:
 			// цифра или число возможно
 			if( Character.isDigit( curChar ) ){
-				result = getNumberFromBuffer( curChar );
+				currentToken = getNumberFromBuffer( curChar );
 			}
 			
 			break;
 		}
-		
-		return result;
-	}
-
-	// сравнивает токен с известным типом
-	public static boolean match( Token token, TokenType etalon ){
-		return (token.getTokenType() == etalon);
 	}
 	
 	// если это разделительный символ, то проматываем
@@ -72,12 +86,4 @@ public class Lexer {
 		
 		return ch;
 	}
-	
-	/*
-	// В идеале достаточно 2 символов для определения любого токена
-	private static TokenType determineTokenType( char cur, int next ){
-		
-		
-		return null;
-	}*/
 }

@@ -9,8 +9,8 @@ params -> type name , params | type name
 body -> command ; body | E
 command -> type name | name = expr | return expr
 
-expr -> term [+-] term //?
-term -> factor [*/] factor //?
+expr -> term [+-] term [+-] ... [+-] term // неформально определены
+term -> factor [*/] factor [*/] ... [*/] factor // неформально определены
 factor -> power ^ factor | power
 power -> atom | - atom
 atom -> number | name | ( expr ) | name ( arglist )
