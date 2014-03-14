@@ -16,7 +16,7 @@ public class BufferTest {
 	@Test
 	public void test() {
 		
-		Buffer buffer = new Buffer( new StringReader("SDFSDFFADFASDFASDF") ); 
+		Buffer buffer = new Buffer( new StringReader("SDFSDFFADFASDFASDF"), 10 ); 
 		
 		assertEquals( 'A', buffer.getChar() );
 		
