@@ -1,0 +1,25 @@
+==================Rules==================
+program -> function functionList
+functionList -> function functionList | E
+function -> type name ( parlist ) { body }
+
+parlist -> type name | type name , params | E
+params -> type name , params | type name
+
+body -> command ; body | E
+command -> type name | name = expr | return expr
+
+expr -> term [+-] term //?
+term -> factor [*/] factor //?
+factor -> power ^ factor | power
+power -> atom | - atom
+atom -> number | name | ( expr ) | name ( arglist )
+
+arglist -> expr | args | E
+args -> expr , args | expr
+
+type -> int | double
+
+==================Reference==============
+E - empty word
+[...] - any word of brackets
