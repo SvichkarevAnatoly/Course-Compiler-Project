@@ -11,10 +11,10 @@ public class Parser {
 		this.lexer = lexer;
 	}
 
-	public int parseExpr(){
-		int result = parseTerm();
+	public double parseExpr(){
+		double result = parseTerm();
 		
-		int secondTerm = 0;
+		double secondTerm = 0;
 		Token<?> curToken = lexer.peekToken();
 		while( Lexer.match( curToken, TokenType.PLUS ) ||
 				Lexer.match( curToken, TokenType.MINUS ) ){
@@ -38,10 +38,10 @@ public class Parser {
 		return result;
 	}
 	
-	public int parseTerm(){
-		int result = parseFactor();
+	public double parseTerm(){
+		double result = parseFactor();
 		
-		int secondFactor = 0;
+		double secondFactor = 0;
 		Token<?> curToken = lexer.peekToken();
 		while( Lexer.match( curToken, TokenType.MULTIPLICATION ) ||
 				Lexer.match( curToken, TokenType.DIVISION ) ){
@@ -65,21 +65,21 @@ public class Parser {
 		return result;
 	}
 	
-	public int parseFactor(){
-		int result = parsePower();
+	public double parseFactor(){
+		double result = parsePower();
 		
 		Token<?> curToken = lexer.peekToken();
 		if( Lexer.match( curToken, TokenType.EXPONENTIATION ) ){
 			lexer.getToken(); // пропускаем знак ^
-			int secondPower = parseFactor();
-			result = (int) Math.pow( result, secondPower ); // TODO: Так нельзя! нужна нормальная целочисленная функция
+			double secondPower = parseFactor();
+			result = Math.pow( result, secondPower ); // TODO: Так нельзя! нужна нормальная целочисленная функция
 		}
 		
 		return result;
 	}
 	
-	public int parsePower(){
-		int result;
+	public double parsePower(){
+		double result;
 		int sign = 1;
 		
 		Token<?> curToken = lexer.peekToken();
@@ -93,9 +93,9 @@ public class Parser {
 		return result * sign;
 	}
 	
-	public int parseAtom(){
+	public double parseAtom(){
 		//TODO: Простой вариант - только int
-		int result = 0; // TODO: убрать инициализацию
+		double result = 0; // TODO: убрать инициализацию
 		
 		Token<?> token = lexer.getToken();
 		if( Lexer.match( token, TokenType.BRACKET_OPEN ) ){
@@ -108,7 +108,7 @@ public class Parser {
 			}
 		} else{
 			if( Lexer.match( token, TokenType.NUMBER ) ){
-				result = (Integer) token.getTokenValue();
+				result = (Double)token.getTokenValue();
 			} else{
 				// TODO: кинуть ошибку
 			}

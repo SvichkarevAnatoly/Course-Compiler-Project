@@ -85,14 +85,39 @@ public class Lexer {
 		}
 	}
 	
-	private Token<Integer> getNumberFromBuffer( char curChar ) {
+	private Token<?> getNumberFromBuffer( char curChar ) {
 		int number = Character.getNumericValue( curChar );
 		
-		while( Character.isDigit( peekCharFromBuffer() ) ){
-			number = 10 * number + Character.getNumericValue( buffer.getChar() );
+		int shiftComma = -1;
+		
+		while( Character.isDigit( peekCharFromBuffer()) || (peekCharFromBuffer() == '.') ){
+			// если встретили точку или сдвиг уже считается, то делаем инкремент
+			if( (shiftComma > -1) || (peekCharFromBuffer() == '.') ){
+				shiftComma++;
+			}
+			if( shiftComma != 0 ){ // если у нас не точка, то цифра
+				number = 10 * number + Character.getNumericValue( buffer.getChar() );
+			} else{
+				buffer.getChar(); // проматываем точку, если встретили
+			}
 		}
 		
-		return new Token<Integer>( TokenType.NUMBER, number );
+		switch (shiftComma) {
+		case -1: // int
+			return new Token<Double>( TokenType.NUMBER, (double)number );	// TODO: потом поменять на Integer
+		case 0:
+			// число на точку не может заканчиваться
+			// TODO: кидаем ошибку
+			break;
+		default: // double
+			double doubleNumber = number;
+			double tenPower = Math.pow( 10, shiftComma ); // TODO: корректно ли так делать?
+			doubleNumber /= tenPower;
+			
+			return new Token<Double>( TokenType.NUMBER, doubleNumber ); // TODO: добавить типы int и double вместо number
+		}
+		
+		return new Token<Integer>( TokenType.NUMBER, 999 ); // TODO: заглушка вместо ошибке в case
 	}
 	
 	private int peekCharFromBuffer(){
