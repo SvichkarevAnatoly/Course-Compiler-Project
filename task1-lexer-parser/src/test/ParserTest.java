@@ -149,7 +149,7 @@ public class ParserTest extends Assert {
 	
 	@Test
 	public void testExpr2() {
-		Buffer buffer = new Buffer( new StringReader("(2+3)*2 + 1^2"), DEFAULT_SIZE );
+		Buffer buffer = new Buffer( new StringReader("(2.3+2.7)*2 + 1.00^2"), DEFAULT_SIZE );
 		Lexer lexer = new Lexer( buffer );
 		Parser parser = new Parser( lexer );
 		
