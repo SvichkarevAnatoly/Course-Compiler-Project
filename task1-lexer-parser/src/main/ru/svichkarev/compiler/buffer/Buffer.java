@@ -3,7 +3,7 @@ package main.ru.svichkarev.compiler.buffer;
 import java.io.Reader;
 
 public class Buffer {
-	final static int END_OF_SOURSE_CODE = -1;
+	final static int END_OF_SOURCE_CODE = -1;
 	
 	private Reader reader;
 	private int maxIndex = 0;
@@ -36,7 +36,7 @@ public class Buffer {
 			writeInBuffer();
 		}
 		if( isEndSourseCode ){
-			return END_OF_SOURSE_CODE;
+			return END_OF_SOURCE_CODE;
 		}
 		
 		return localBuf[ indexBuf ];
@@ -50,7 +50,7 @@ public class Buffer {
 		try {
 			indexBuf = 0; // TODO: что раньше нужно?
 			int numCharRead = reader.read( localBuf ); // TODO: посмотреть его поведение
-			if( numCharRead == END_OF_SOURSE_CODE ){ // закончился исходник
+			if( numCharRead == END_OF_SOURCE_CODE ){ // закончился исходник
 				isEndSourseCode = true;
 			} else{
 				// новая граница буфера

@@ -8,7 +8,7 @@ public class Lexer {
 	private Token<?> currentToken = null;
 	
 	// TODO: куча всяких флажков
-	private boolean isEndSourseCode = false;
+	private boolean isEndSourceCode = false;
 	
 	public Lexer( Buffer buffer ) {
 		this.buffer = buffer;
@@ -39,48 +39,123 @@ public class Lexer {
 	
 	// считывает токен и пишет в поле текущего токена
 	private void makeToken(){
-		if( isEndSourseCode ){
+		if( isEndSourceCode ){
 			currentToken = new Token<String>( TokenType.END , "End" );
 			return;
 		}
 		
-		readThroughSpacesAndComments();
-		char curChar = buffer.getChar();
-		switch (curChar) {
-		case '+':
-			currentToken = new Token<String>( TokenType.PLUS, "+" ); // TODO: почему так?
-			break;
-		case '-':
-			currentToken = new Token<String>( TokenType.MINUS, "-" ); // TODO: почему так?
-			break;
-		case '*':
-			currentToken = new Token<String>( TokenType.MULTIPLICATION, "*" ); // TODO: почему так?
-			break;
-		case '/':
-			currentToken = new Token<String>( TokenType.DIVISION, "/" ); // TODO: почему так?
-			break;
-		case '^':
-			currentToken = new Token<String>( TokenType.EXPONENTIATION, "^" ); // TODO: почему так?
-			break;
-		case '(':
-			currentToken = new Token<String>( TokenType.BRACKET_OPEN, "(" ); // TODO: почему так?
-			break;
-		case ')':
-			currentToken = new Token<String>( TokenType.BRACKET_CLOSE, ")" ); // TODO: почему так?
-			break;
-		default:
-			// цифра или число возможно
-			if( Character.isDigit( curChar ) ){
-				currentToken = getNumberFromBuffer( curChar );
+		boolean isDetectToken = false;
+		while( !isDetectToken ){ //из-за постоянных комментарием придётся зациклить, как будет нормальный символ, вернём токен
+			readThroughSpacesAndComments(); // TODO: если получится выпилить комментарии, то поменять название
+			char curChar = buffer.getChar();
+			switch (curChar) {
+			case '+':
+				currentToken = new Token<String>( TokenType.PLUS, "+" ); // TODO: почему так?
+				isDetectToken = true;
+				break;
+			case '-':
+				currentToken = new Token<String>( TokenType.MINUS, "-" ); // TODO: почему так?
+				isDetectToken = true;
+				break;
+			case '*':
+				currentToken = new Token<String>( TokenType.MULTIPLICATION, "*" ); // TODO: почему так?
+				isDetectToken = true;
+				break;
+			case '/':
+				/*Возможны 3 варианта:
+				 * 1) это просто деление
+				 * 2) это однострочный комментарий
+				 * 3) это многострочный комментарий*/
+				if( tryDetectingCommentAndRemove() ){
+					break;
+				}
+				
+				// значит это знак деления
+				currentToken = new Token<String>( TokenType.DIVISION, "/" ); // TODO: почему так?
+				isDetectToken = true;
+				break;
+			case '^':
+				currentToken = new Token<String>( TokenType.EXPONENTIATION, "^" ); // TODO: почему так?
+				isDetectToken = true;
+				break;
+			case '(':
+				currentToken = new Token<String>( TokenType.BRACKET_OPEN, "(" ); // TODO: почему так?
+				isDetectToken = true;
+				break;
+			case ')':
+				currentToken = new Token<String>( TokenType.BRACKET_CLOSE, ")" ); // TODO: почему так?
+				isDetectToken = true;
+				break;
+			default:
+				// могут быть пробелы до конца
+				if( isEndSourceCode ){
+					currentToken = new Token<String>( TokenType.END , "End" );
+					return;
+				}
+				// цифра или число возможно
+				if( Character.isDigit( curChar ) ){
+					currentToken = getNumberFromBuffer( curChar );
+					isDetectToken = true;
+				}
+				// TODO: кинуть исключение если фигня
+				
+				break;
 			}
-			
-			break;
 		}
 	}
 	
-	// если это разделительный символ, то проматываем
+	/* Пытаемся удалить комментарий,
+	 * если выйдет, то вернуть true*/
+	private boolean tryDetectingCommentAndRemove(){
+		char nextChar = (char) peekCharFromBuffer(); // TODO: testing
+		if( isEndSourceCode ){
+			// TODO: буфер закончился, нужно кидать ошибку
+		} else{
+			switch (nextChar) {
+			case '/': // однострочный комментарий
+				// пока не встретим перевод строки, всё пропускаем
+				while( buffer.getChar() != '\n' );
+				
+				// дальше нужно заного пытаться распознать символ
+				return true;
+			case '*': // это многострочный комментарий
+				buffer.getChar(); // пропустили звёздочку
+				// проматываем, пока не встретим комбинацию конца коментария
+				boolean isEndMultilineComment = false;
+				while( !isEndMultilineComment ){ // TODO: пооптимизировать
+					peekCharFromBuffer();
+					if( isEndSourceCode ){
+						// TODO: кинуть исключение
+						return true; // TODO: заглушка
+					} else{
+						char nextCommentChar = buffer.getChar();
+						if( nextCommentChar == '*' ){
+							// претендент на закрытие комментария
+							if( peekCharFromBuffer() == '/' ){
+								if( !isEndSourceCode ){
+									// это оно - закрытие комментария!
+									isEndMultilineComment = true;
+									buffer.getChar();
+								} else{
+									// TODO: кидаем ошибку
+									return true; // TODO: заглушка
+								}
+							}
+						}
+					}
+				}
+				return true;
+			default:
+				return false;
+			}
+		}
+		
+		return false;
+	}
+
+	// если это разделительный символ(конец строки), то проматываем
 	private void readThroughSpacesAndComments(){
-		while( Character.isSpaceChar( peekCharFromBuffer() ) ){
+		while( Character.isWhitespace( peekCharFromBuffer() )){
 			buffer.getChar();
 		}
 	}
@@ -124,7 +199,7 @@ public class Lexer {
 		int ch = buffer.peekChar();
 		
 		if( ch == -1 ){
-			isEndSourseCode = true;
+			isEndSourceCode = true;
 		}
 		
 		return ch;
