@@ -8,7 +8,8 @@ import main.ru.svichkarev.compiler.parser.Parser;
 
 public final class Main {
 	public static void main(String[] args) {
-		Buffer buffer = new Buffer( new StringReader("(  3  ^2.1) + (2.00+3.0)*2 +-(9)+5*7-100"), 5 );
+		Buffer buffer = new Buffer( new StringReader("(1+-1) + (2+3)*2 + 2^2^(1*2) "), 5 );
+		// TODO: при таком вводе выдаёт 10.0: "(1+-1) + (2+3)*2 + 2^2^(1*2) "
 		Lexer lexer = new Lexer( buffer );
 		Parser parser = new Parser( lexer );
 		
