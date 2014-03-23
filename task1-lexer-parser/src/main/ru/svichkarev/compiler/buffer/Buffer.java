@@ -14,6 +14,10 @@ public class Buffer {
 	private boolean isEndSourseCode = false;
 	
 	public Buffer( Reader reader, int capacity ) {
+		if( capacity < 1 ){
+			throw new IllegalArgumentException( "capacity must be more than 0" );
+		}
+		
 		this.reader = reader;
 		localBuf = new char[ capacity ];
 		
