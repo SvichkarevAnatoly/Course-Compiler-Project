@@ -11,26 +11,22 @@ public class Parser {
 		this.lexer = lexer;
 	}
 
-	public double parseExpr(){
-		double result = parseTerm();
+	public Node parseExpr(){
+		Node result = parseTerm();
 		
-		double secondTerm = 0;
 		Token<?> curToken = lexer.peekToken();
 		while( Lexer.match( curToken, TokenType.PLUS ) ||
 				Lexer.match( curToken, TokenType.MINUS ) ){
 			
+			// пропускаем знак
 			lexer.getToken();
-			secondTerm = parseTerm();
-			switch( curToken.getTokenType() ) {
-			case PLUS:
-				result += secondTerm;
-				break;
-			case MINUS:
-				result -= secondTerm;
-				break;
-			default:
-				break;
-			}
+			
+			// комплектуем дерево
+			Node sign = new Node( curToken );
+			sign.setLeft( result );
+			sign.setRight( parseTerm() );
+			
+			result = sign;
 			
 			curToken = lexer.peekToken();
 		}
@@ -38,26 +34,21 @@ public class Parser {
 		return result;
 	}
 	
-	public double parseTerm(){
-		double result = parseFactor();
+	public Node parseTerm(){
+		Node result = parseFactor();
 		
-		double secondFactor = 0;
 		Token<?> curToken = lexer.peekToken();
 		while( Lexer.match( curToken, TokenType.MULTIPLICATION ) ||
 				Lexer.match( curToken, TokenType.DIVISION ) ){
 			
 			lexer.getToken();
-			secondFactor = parseFactor();
-			switch( curToken.getTokenType() ) {
-			case MULTIPLICATION:
-				result *= secondFactor;
-				break;
-			case DIVISION:
-				result /= secondFactor;
-				break;
-			default:
-				break;
-			}
+			
+			// комплектуем дерево
+			Node sign = new Node( curToken );
+			sign.setLeft( result );
+			sign.setRight( parseFactor() );
+			
+			result = sign;
 			
 			curToken = lexer.peekToken();
 		}
@@ -65,37 +56,39 @@ public class Parser {
 		return result;
 	}
 	
-	public double parseFactor(){
-		double result = parsePower();
+	public Node parseFactor(){
+		Node result = parsePower();
 		
 		Token<?> curToken = lexer.peekToken();
 		if( Lexer.match( curToken, TokenType.EXPONENTIATION ) ){
 			lexer.getToken(); // пропускаем знак ^
-			double secondPower = parseFactor();
-			result = Math.pow( result, secondPower ); // TODO: Так нельзя! нужна нормальная целочисленная функция
+			
+			Node exp = new Node( curToken );
+			exp.setLeft( result );
+			exp.setRight( parseFactor() );
+			
+			result = exp;
 		}
 		
 		return result;
 	}
 	
-	public double parsePower(){
-		double result;
-		int sign = 1;
-		
+	public Node parsePower(){
 		Token<?> curToken = lexer.peekToken();
 		// если унарный минус
 		if( Lexer.match( curToken, TokenType.MINUS ) ){
 			lexer.getToken(); // пропускаем -
-			sign = -1;
+			
+			Node minus = new Node( curToken );
+			minus.setLeft( parseAtom() ); // тут только левый ребёнок
+			return minus;
 		}
-		result = parseAtom();
 		
-		return result * sign;
+		return parseAtom();
 	}
 	
-	public double parseAtom(){
-		//TODO: Простой вариант - только int
-		double result = 0; // TODO: убрать инициализацию
+	public Node parseAtom(){
+		Node result = null;
 		
 		Token<?> token = lexer.getToken();
 		if( Lexer.match( token, TokenType.BRACKET_OPEN ) ){
@@ -108,7 +101,7 @@ public class Parser {
 			}
 		} else{
 			if( Lexer.match( token, TokenType.NUMBER ) ){
-				result = (Double)token.getTokenValue();
+				result = new Node( token );
 			} else{
 				// TODO: кинуть ошибку
 			}

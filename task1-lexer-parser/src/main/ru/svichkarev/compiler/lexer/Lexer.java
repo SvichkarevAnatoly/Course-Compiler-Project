@@ -179,7 +179,7 @@ public class Lexer {
 		
 		switch (shiftComma) {
 		case -1: // int
-			return new Token<Double>( TokenType.NUMBER, (double)number );	// TODO: потом поменять на Integer
+			return new Token<Integer>( TokenType.NUMBER, number );
 		case 0:
 			// число на точку не может заканчиваться
 			// TODO: кидаем ошибку

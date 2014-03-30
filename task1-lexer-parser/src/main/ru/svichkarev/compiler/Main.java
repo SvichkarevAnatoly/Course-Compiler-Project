@@ -21,9 +21,9 @@ public final class Main {
 			Lexer lexer = new Lexer( buffer );
 			Parser parser = new Parser( lexer );
 			
-			double globResult = parser.parseExpr();
+			//double globResult = parser.parseExpr();
 			
-			System.out.println( globResult );
+			//System.out.println( globResult );
 		}
 		
 		sc.close();
