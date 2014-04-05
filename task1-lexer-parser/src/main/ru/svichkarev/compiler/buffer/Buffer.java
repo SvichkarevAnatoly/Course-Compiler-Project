@@ -14,8 +14,8 @@ public class Buffer {
 	private boolean isEndSourseCode = false;
 	
 	public Buffer( Reader reader, int capacity ) {
-		if( capacity < 1 ){
-			throw new IllegalArgumentException( "capacity must be more than 0" );
+		if( capacity < 2 ){
+			throw new IllegalArgumentException( "capacity must be more than 1" );
 		}
 		
 		this.reader = reader;
@@ -24,9 +24,8 @@ public class Buffer {
 		writeInBuffer();
 	}
 	
-	// TODO: может ли здесь быть конец файла?
 	public char getChar() {
-		if( isBufferEnded() ){
+		if( isBufferEnded( 0 ) ){
 			writeInBuffer();
 		}
 		
@@ -35,8 +34,7 @@ public class Buffer {
 	
 	// Не сдвигаем указатель
 	public int peekChar(){
-		// TODO: нужно ли каждый раз проверять?
-		if( isBufferEnded() ){
+		if( isBufferEnded( 0 ) ){
 			writeInBuffer();
 		}
 		if( isEndSourseCode ){
@@ -46,19 +44,41 @@ public class Buffer {
 		return localBuf[ indexBuf ];
 	}
 
-	private boolean isBufferEnded() {
-		return (indexBuf == maxIndex);
+	// просмотр на два символа вперёд без сдвига указателя
+	public int peekSecondChar(){
+		if( isBufferEnded( 1 ) ){
+			writeInBuffer();
+		}
+		
+		if( isEndSourseCode ){
+			return END_OF_SOURCE_CODE;
+		}
+		
+		return localBuf[ indexBuf + 1 ];
+	}
+	
+	// проверка окончания буфера при смещении на shift == 0 или 1(при просмотре через 1)
+	private boolean isBufferEnded( int shift ) {
+		return (indexBuf + shift == maxIndex);
 	}
 	
 	private void writeInBuffer() {
-		try {
-			indexBuf = 0; // TODO: что раньше нужно?
-			int numCharRead = reader.read( localBuf ); // TODO: посмотреть его поведение
+		// если мы выполняем обновление буфера из-за peekSecondChar,
+		//то нужно скопировать последний символ вначало
+		if( isBufferEnded( 1 ) && !isBufferEnded( 0 )  ){
+			localBuf[ 0 ] = localBuf[ indexBuf ];
+			indexBuf = 1;
+		} else{
+			indexBuf = 0;
+		}
+		
+		try{
+			int numCharRead = reader.read( localBuf, indexBuf, localBuf.length - indexBuf );
 			if( numCharRead == END_OF_SOURCE_CODE ){ // закончился исходник
 				isEndSourseCode = true;
 			} else{
 				// новая граница буфера
-				maxIndex = numCharRead;
+				maxIndex = numCharRead + indexBuf;
 			}
 		} catch (Exception e) {
 			// TODO: handle exception

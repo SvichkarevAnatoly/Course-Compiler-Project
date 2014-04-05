@@ -1,6 +1,5 @@
 package test.java;
 
-
 import static org.junit.Assert.assertEquals;
 
 import java.io.StringReader;
@@ -17,6 +16,27 @@ public class BufferTest {
 	public void testIllegalCapacity() {
 		Buffer buffer = new Buffer( new StringReader("AA"), 0 );
 		buffer.getChar();
+	}
+	
+	@Test(expected = IllegalArgumentException.class)
+	public void testIllegalCapacity2() {
+		Buffer buffer = new Buffer( new StringReader("AA"), 1 );
+		buffer.getChar();
+	}
+	
+	@Test
+	public void testTwoCapacity() {
+		Buffer buffer = new Buffer( new StringReader("AB"), 2 );
+		assertEquals( 'A', buffer.peekChar() );
+		assertEquals( 'B', buffer.peekSecondChar() );
+		
+		assertEquals( 'A', buffer.getChar() );
+		assertEquals( 'B', buffer.peekChar() );
+		assertEquals( END_OF_SOURCE_CODE, buffer.peekSecondChar() );
+		
+		assertEquals( 'B', buffer.getChar() );
+		assertEquals( END_OF_SOURCE_CODE, buffer.peekChar() );
+		assertEquals( END_OF_SOURCE_CODE, buffer.peekSecondChar() );
 	}
 	
 	@Test
