@@ -22,7 +22,7 @@ public class LexerTest extends Assert {
 		
 		Token<?> token1 = lexer.getToken();
 		assertEquals( TokenType.NUMBER, token1.getTokenType() );
-		assertEquals( 42.0, ((Double)token1.getTokenValue()).doubleValue() );
+		assertEquals( 42, token1.getTokenValue() );
 	}
 	
 	@Test
@@ -108,6 +108,16 @@ public class LexerTest extends Assert {
 	@Test
 	public void testEnd(){
 		Buffer buffer = new Buffer( new StringReader( "" ), DEFAULT_SIZE );
+		Lexer lexer = new Lexer( buffer );
+		
+		Token<?> token1 = lexer.getToken();
+		assertEquals( TokenType.END, token1.getTokenType() );
+		assertEquals( "End", token1.getTokenValue() );
+	}
+	
+	@Test
+	public void testCommentSingleLine(){
+		Buffer buffer = new Buffer( new StringReader( "//54 + 43" ), DEFAULT_SIZE );
 		Lexer lexer = new Lexer( buffer );
 		
 		Token<?> token1 = lexer.getToken();
