@@ -46,6 +46,11 @@ public class Lexer {
 		
 		readThroughSpacesAndComments();
 		
+		if( isEndSourceCode ){
+			currentToken = new Token<String>( TokenType.END , "End" );
+			return;
+		}
+		
 		char curChar = buffer.getChar();
 		switch (curChar) {
 		case '+':
@@ -134,6 +139,7 @@ public class Lexer {
 										// это оно - закрытие комментария!
 										isEndMultilineComment = true;
 										buffer.getChar();
+										//buffer.getChar(); // TODO: не должен быть
 									} else{
 										// TODO: кидаем ошибку
 										return; // TODO: заглушка
@@ -143,7 +149,15 @@ public class Lexer {
 						}
 					}
 					// очистили от коментария, запускаем снова
+					break;
 				default: // не комментарий
+					// TODO: похоже на костыль
+					// возможно знак деления и конец строки
+					if( isEndSourceCode ){
+						// типо мы ничего не видели
+						isEndSourceCode = false;
+					}
+					
 					return;
 				}
 			} else{

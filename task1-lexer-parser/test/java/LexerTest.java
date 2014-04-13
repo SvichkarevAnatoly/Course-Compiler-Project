@@ -1,7 +1,5 @@
 package test.java;
 
-import java.io.FileNotFoundException;
-import java.io.FileReader;
 import java.io.StringReader;
 
 import junit.framework.Assert;
@@ -126,13 +124,23 @@ public class LexerTest extends Assert {
 	}
 	
 	@Test
-	public void testFromFile1() throws FileNotFoundException {
-		Buffer buffer = new Buffer( new FileReader( "test/resources/testLexer1.myc" ), DEFAULT_SIZE );
+	public void testCommentMultiplyLine(){
+		Buffer buffer = new Buffer( new StringReader( "/*54 + 43*/  " ), DEFAULT_SIZE );
+		Lexer lexer = new Lexer( buffer );
+		
+		Token<?> token1 = lexer.getToken();
+		assertEquals( TokenType.END, token1.getTokenType() );
+		assertEquals( "End", token1.getTokenValue() );
+	}
+	
+	@Test
+	public void testEmptyLine() {
+		Buffer buffer = new Buffer( new StringReader( "  2  + 3  \n   " ), DEFAULT_SIZE );
 		Lexer lexer = new Lexer( buffer );
 		
 		Token<?> token1 = lexer.getToken();
 		assertEquals( TokenType.NUMBER, token1.getTokenType() );
-		assertEquals( 2.0, ((Double)token1.getTokenValue()).doubleValue() );
+		assertEquals( 2, token1.getTokenValue() );
 		
 		Token<?> token2 = lexer.getToken();
 		assertEquals( TokenType.PLUS, token2.getTokenType() );
@@ -140,7 +148,7 @@ public class LexerTest extends Assert {
 		
 		Token<?> token3 = lexer.getToken();
 		assertEquals( TokenType.NUMBER, token3.getTokenType() );
-		assertEquals( 3.0, ((Double)token3.getTokenValue()).doubleValue() );
+		assertEquals( 3, token3.getTokenValue() );
 		
 		Token<?> token4 = lexer.getToken();
 		assertEquals( TokenType.END, token4.getTokenType() );
@@ -152,13 +160,13 @@ public class LexerTest extends Assert {
 	}
 	
 	@Test
-	public void testFromFile2() throws FileNotFoundException {
-		Buffer buffer = new Buffer( new FileReader( "test/resources/testLexer2.myc" ), DEFAULT_SIZE );
+	public void testManyLines() {
+		Buffer buffer = new Buffer( new StringReader( "  2 \n   +\n   3\n" ), DEFAULT_SIZE );
 		Lexer lexer = new Lexer( buffer );
 		
 		Token<?> token1 = lexer.getToken();
 		assertEquals( TokenType.NUMBER, token1.getTokenType() );
-		assertEquals( 2.0, ((Double)token1.getTokenValue()).doubleValue() );
+		assertEquals( 2, token1.getTokenValue() );
 		
 		Token<?> token2 = lexer.getToken();
 		assertEquals( TokenType.PLUS, token2.getTokenType() );
@@ -166,7 +174,7 @@ public class LexerTest extends Assert {
 		
 		Token<?> token3 = lexer.getToken();
 		assertEquals( TokenType.NUMBER, token3.getTokenType() );
-		assertEquals( 3.0, ((Double)token3.getTokenValue()).doubleValue() );
+		assertEquals( 3, token3.getTokenValue() );
 		
 		Token<?> token4 = lexer.getToken();
 		assertEquals( TokenType.END, token4.getTokenType() );
@@ -178,13 +186,13 @@ public class LexerTest extends Assert {
 	}
 
 	@Test
-	public void testFromFile3() throws FileNotFoundException {
-		Buffer buffer = new Buffer( new FileReader( "test/resources/testLexer3.myc" ), DEFAULT_SIZE );
+	public void testCommentSingleLine2() {
+		Buffer buffer = new Buffer( new StringReader( " 3 //2\n   + 4 " ), DEFAULT_SIZE );
 		Lexer lexer = new Lexer( buffer );
 		
 		Token<?> token1 = lexer.getToken();
 		assertEquals( TokenType.NUMBER, token1.getTokenType() );
-		assertEquals( 3.0, ((Double)token1.getTokenValue()).doubleValue() );
+		assertEquals( 3, token1.getTokenValue() );
 		
 		Token<?> token2 = lexer.getToken();
 		assertEquals( TokenType.PLUS, token2.getTokenType() );
@@ -192,7 +200,7 @@ public class LexerTest extends Assert {
 		
 		Token<?> token3 = lexer.getToken();
 		assertEquals( TokenType.NUMBER, token3.getTokenType() );
-		assertEquals( 4.0, ((Double)token3.getTokenValue()).doubleValue() );
+		assertEquals( 4, token3.getTokenValue() );
 		
 		Token<?> token4 = lexer.getToken();
 		assertEquals( TokenType.END, token4.getTokenType() );
@@ -203,14 +211,16 @@ public class LexerTest extends Assert {
 		assertEquals( "End", token5.getTokenValue() );
 	}
 	
+	
+	
 	@Test
-	public void testFromFile4() throws FileNotFoundException {
-		Buffer buffer = new Buffer( new FileReader( "test/resources/testLexer4.myc" ), DEFAULT_SIZE );
+	public void testCommentMultiplyLineComplex() {
+		Buffer buffer = new Buffer( new StringReader( " /* 56  */  3  /* 123123 123123 1123 13123 1313 13131 13 131  3131 3123 112*/    /**//*2\n   */+ 4 /**/\n" ), DEFAULT_SIZE );
 		Lexer lexer = new Lexer( buffer );
 		
 		Token<?> token1 = lexer.getToken();
 		assertEquals( TokenType.NUMBER, token1.getTokenType() );
-		assertEquals( 3.0, ((Double)token1.getTokenValue()).doubleValue() );
+		assertEquals( 3, token1.getTokenValue() );
 		
 		Token<?> token2 = lexer.getToken();
 		assertEquals( TokenType.PLUS, token2.getTokenType() );
@@ -218,7 +228,7 @@ public class LexerTest extends Assert {
 		
 		Token<?> token3 = lexer.getToken();
 		assertEquals( TokenType.NUMBER, token3.getTokenType() );
-		assertEquals( 4.0, ((Double)token3.getTokenValue()).doubleValue() );
+		assertEquals( 4, token3.getTokenValue() );
 		
 		Token<?> token4 = lexer.getToken();
 		assertEquals( TokenType.END, token4.getTokenType() );

@@ -13,6 +13,7 @@ public class Buffer {
 	
 	private boolean isEndSourseCode = false;
 	
+	//TODO: сделать конструктор с ёмкостью по-умолчанию
 	public Buffer( Reader reader, int capacity ) {
 		if( capacity < 2 ){
 			throw new IllegalArgumentException( "capacity must be more than 1" );
