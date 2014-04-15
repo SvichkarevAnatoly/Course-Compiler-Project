@@ -32,6 +32,7 @@ public enum TokenType {
 	
 	// TODO: нужен ли
 	CALL_FUNCTION,
+	PRINT,
 	
 	END,
 }

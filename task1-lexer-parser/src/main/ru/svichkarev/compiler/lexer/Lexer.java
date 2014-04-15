@@ -258,6 +258,8 @@ public class Lexer {
 			result = new Token<>( TokenType.INT );
 		} else if( ident.equals( "double" ) ){
 			result = new Token<>( TokenType.DOUBLE );
+		} else if( ident.equals( "print" ) ){
+			result = new Token<>( TokenType.PRINT );
 		} else{
 			result = new Token<String>( TokenType.NAME, ident );
 		}

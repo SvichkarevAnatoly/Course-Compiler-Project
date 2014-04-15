@@ -189,6 +189,24 @@ public class Parser {
 			result.setLeft( new Node(whatEver) );
 			result.setRight( parseExpr() );
 			break;
+		case PRINT:
+			lexer.getToken();
+			Token<?> openBracketToken = lexer.getToken();
+			if( ! openBracketToken.match( TokenType.BRACKET_OPEN ) ){
+				// TODO: кинуть ошибку
+			}
+			Token<?> nameVariable = lexer.getToken();
+			if( ! nameVariable.match( TokenType.NAME ) ){
+				// TODO: кинуть ошибку
+			}
+			Token<?> closeBracketToken = lexer.getToken();
+			if( ! closeBracketToken.match( TokenType.BRACKET_CLOSE ) ){
+				// TODO: кинуть ошибку
+			}
+			result.setLeft( new Node( whatEver ) );
+			result.setRight( new Node( nameVariable ) );
+			
+			break;
 		default:
 			// TODO кинуть исключение
 			break;

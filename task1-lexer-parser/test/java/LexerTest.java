@@ -142,6 +142,15 @@ public class LexerTest extends Assert {
 	}
 	
 	@Test
+	public void testPrint(){
+		Buffer buffer = new Buffer( new StringReader( "print " ) );
+		Lexer lexer = new Lexer( buffer );
+		
+		Token<?> token1 = lexer.getToken();
+		assertEquals( TokenType.PRINT, token1.getTokenType() );
+	}
+	
+	@Test
 	public void testEnd(){
 		Buffer buffer = new Buffer( new StringReader( "" ) );
 		Lexer lexer = new Lexer( buffer );
