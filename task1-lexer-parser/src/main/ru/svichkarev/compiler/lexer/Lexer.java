@@ -81,7 +81,10 @@ public class Lexer {
 		case ';':
 			currentToken = new Token<>( TokenType.SEMICOLON );
 			break;
-		
+		case '=':
+			currentToken = new Token<>( TokenType.ASSIGNMENT );
+			break;
+			
 		default:
 			// цифра или число возможно
 			if( Character.isDigit( curChar ) ){
@@ -238,6 +241,7 @@ public class Lexer {
 			case '{':
 			case ',':
 			case ';':
+			case '=':
 				break;
 			default:
 				// TODO: какая-то фигня впритык, кинуть ошибку

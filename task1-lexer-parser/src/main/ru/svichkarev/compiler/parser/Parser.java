@@ -103,7 +103,7 @@ public class Parser {
 		Node result = new Node( TokenType.PARAMS_LIST ); //TODO: так можно?
 		Token<?> commaToken;
 		do{
-			Node typeNode = parseType();
+			Node typeNode = parseType(); //TODO почему никак не используется
 			Token<?> nameToken = lexer.getToken();
 			if( ! nameToken.match( TokenType.NAME ) ){
 				// TODO: кинуть ошибку
@@ -144,7 +144,7 @@ public class Parser {
 			}
 			command = parseCommand();
 			result.setRight( command );
-		} while( command.match( TokenType.COMMAND ) );
+		} while( ! command.getValue().match( TokenType.EMPTY ) );
 		
 		return result;
 	}
@@ -152,12 +152,20 @@ public class Parser {
 	public Node parseCommand(){
 		Node result = new Node( TokenType.COMMAND );
 		
-		Token<?> whatEver = lexer.getToken();
+		Token<?> whatEver = lexer.peekToken();
 		switch( whatEver.getTokenType() ){
-		case TYPE:
+		case BRACE_CLOSE: // это уже не команда, вернуть пустоту
+			result = new Node( TokenType.EMPTY );
+			break;
+		// TODO: поидее нужно просто TYPE
+		case INT:
+		case DOUBLE:
+			lexer.getToken();
 			Token<?> nameToken = lexer.getToken();
 			if( nameToken.match( TokenType.NAME ) ){
-				result.setLeft( new Node(whatEver) );
+				Node typeNode = new Node( TokenType.TYPE );
+				typeNode.setLeft( new Node( whatEver ) );
+				result.setLeft( typeNode );
 				result.setRight( new Node( nameToken ) );
 			}else{
 				// TODO: кинуть ошибку
@@ -165,10 +173,11 @@ public class Parser {
 			
 			break;
 		case NAME:
-			Token<?> equalToken = lexer.getToken();
-			if( equalToken.match( TokenType.NAME ) ){
+			lexer.getToken();
+			Token<?> assignToken = lexer.getToken();
+			if( assignToken.match( TokenType.ASSIGNMENT ) ){
 				result.setLeft( new Node(whatEver) );
-				result.setRight( new Node( equalToken ) );
+				result.setRight( new Node( assignToken ) );
 				result.setRight( parseExpr() );
 			}else{
 				// TODO: кинуть ошибку
@@ -176,6 +185,7 @@ public class Parser {
 			
 			break;
 		case RETURN:
+			lexer.getToken();
 			result.setLeft( new Node(whatEver) );
 			result.setRight( parseExpr() );
 			break;

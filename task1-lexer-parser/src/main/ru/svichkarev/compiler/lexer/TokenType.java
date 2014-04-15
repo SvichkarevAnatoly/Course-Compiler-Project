@@ -24,8 +24,9 @@ public enum TokenType {
 	ARG_LIST,
 	
 	TYPE,
-	
 	INT, DOUBLE,
+	
+	ASSIGNMENT, // присваивание
 	
 	RETURN,
 	
