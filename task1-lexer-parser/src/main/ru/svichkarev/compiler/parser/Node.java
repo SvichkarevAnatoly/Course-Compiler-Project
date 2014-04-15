@@ -23,6 +23,12 @@ public class Node {
 		listChild = new ArrayList< Node >();
 	}
 	
+	// для более простого создания нетерминалов
+	public Node( TokenType typeValue ) {
+		value = new Token<>( typeValue );
+		listChild = new ArrayList< Node >();
+	}
+	
 	public void setLeft( Node leftChild ){
 		// указываем индекс, чтобы явно перед всеми другими добавил
 		listChild.add(0, leftChild);

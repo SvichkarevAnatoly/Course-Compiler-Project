@@ -31,12 +31,6 @@ public class Lexer {
 		
 		return result;
 	}
-
-	// TODO: перенести в класс Token
-	// сравнивает токен с известным типом
-	public static boolean match( Token<?> token, TokenType etalon ){
-		return (token.getTokenType() == etalon);
-	}
 	
 	// считывает токен и пишет в поле текущего токена
 	private void makeToken(){

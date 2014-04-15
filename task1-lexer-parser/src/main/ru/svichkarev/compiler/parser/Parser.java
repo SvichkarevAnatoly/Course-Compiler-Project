@@ -15,7 +15,7 @@ public class Parser {
 	public Node parseProgram(){
 		// TODO: у программы нет ничего в содержимом
 		//это просто список функций
-		Node result = new Node( null );
+		Node result = new Node( new Token<>( TokenType.PROGRAM ) );
 
 		//правило вывода:
 		//functionList -> function functionList | E вырождается
@@ -25,7 +25,7 @@ public class Parser {
 		// цикл - пока получается вытаскивать функцию,
 		//если вернёт пусто, то останавливаемся
 		Node curFunction = parseFunction();
-		while( curFunction.match( TokenType.EMPTY ) ){
+		while( ! curFunction.match( TokenType.EMPTY ) ){
 			result.setRight( curFunction );
 			curFunction = parseFunction();
 		}
@@ -238,8 +238,8 @@ public class Parser {
 		Node result = parseTerm();
 		
 		Token<?> curToken = lexer.peekToken();
-		while( Lexer.match( curToken, TokenType.PLUS ) ||
-				Lexer.match( curToken, TokenType.MINUS ) ){
+		while( curToken.match( TokenType.PLUS ) ||
+			   curToken.match( TokenType.MINUS ) ){
 			
 			// пропускаем знак
 			lexer.getToken();
@@ -261,8 +261,8 @@ public class Parser {
 		Node result = parseFactor();
 		
 		Token<?> curToken = lexer.peekToken();
-		while( Lexer.match( curToken, TokenType.MULTIPLICATION ) ||
-				Lexer.match( curToken, TokenType.DIVISION ) ){
+		while( curToken.match( TokenType.MULTIPLICATION ) ||
+			   curToken.match( TokenType.DIVISION ) ){
 			
 			lexer.getToken();
 			
@@ -283,7 +283,7 @@ public class Parser {
 		Node result = parsePower();
 		
 		Token<?> curToken = lexer.peekToken();
-		if( Lexer.match( curToken, TokenType.EXPONENTIATION ) ){
+		if( curToken.match( TokenType.EXPONENTIATION ) ){
 			lexer.getToken(); // пропускаем знак ^
 			
 			Node exp = new Node( curToken );
@@ -299,7 +299,7 @@ public class Parser {
 	public Node parsePower(){
 		Token<?> curToken = lexer.peekToken();
 		// если унарный минус
-		if( Lexer.match( curToken, TokenType.MINUS ) ){
+		if( curToken.match( TokenType.MINUS ) ){
 			lexer.getToken(); // пропускаем -
 			
 			Node minus = new Node( curToken );
@@ -319,7 +319,7 @@ public class Parser {
 		case BRACKET_OPEN:
 			result = parseExpr();
 			token = lexer.getToken();
-			if( Lexer.match( token, TokenType.BRACKET_CLOSE ) ){
+			if( token.match( TokenType.BRACKET_CLOSE ) ){
 				return result;
 			}else{
 				// TODO: кинуть ошибку

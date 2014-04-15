@@ -25,8 +25,8 @@ public class Token<T>{
 	}
 	
 	// метод проверки типа
-	public boolean match( TokenType etalon ){
-		return (this.getTokenType() == etalon);
+	public boolean match( TokenType type ){
+		return (this.getTokenType() == type);
 	}
 	
 	@Override

@@ -10,6 +10,8 @@ public enum TokenType {
 	
 	// для всего остального
 	EMPTY, // заглушка для обозначения пустоты в правилах вывода
+	
+	PROGRAM,
 	FUNCTION,
 	NAME,
 	BRACE_OPEN, BRACE_CLOSE, // фигурные скобки
