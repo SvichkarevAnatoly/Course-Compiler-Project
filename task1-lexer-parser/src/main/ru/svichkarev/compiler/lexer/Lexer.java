@@ -69,18 +69,31 @@ public class Lexer {
 		case ')':
 			currentToken = new Token<>( TokenType.BRACKET_CLOSE );
 			break;
+		case '{':
+			currentToken = new Token<>( TokenType.BRACE_OPEN );
+			break;
+		case '}':
+			currentToken = new Token<>( TokenType.BRACE_CLOSE );
+			break;
+		case ',':
+			currentToken = new Token<>( TokenType.COMMA );
+			break;
+		case ';':
+			currentToken = new Token<>( TokenType.SEMICOLON );
+			break;
+		
 		default:
-			// могут быть пробелы до конца
-			if( isEndSourceCode ){
-				currentToken = new Token<>( TokenType.END );
-				return;
-			}
-			
 			// цифра или число возможно
 			if( Character.isDigit( curChar ) ){
 				currentToken = getNumberFromBuffer( curChar );
+			} else{
+				// идентификатор возможно или служебное слово
+				if( Character.isAlphabetic( curChar ) || curChar == '_' ){
+					currentToken = getIdentificatorFromBuffer( curChar );
+				}else{
+					// TODO: кинуть исключение если фигня
+				}
 			}
-			// TODO: кинуть исключение если фигня
 			
 			break;
 		}
@@ -196,6 +209,58 @@ public class Lexer {
 		
 		return new Token<Integer>( TokenType.NUMBER, 999 ); // TODO: заглушка вместо ошибки в case
 	}
+	
+	private Token<?> getIdentificatorFromBuffer( char curChar ) {
+		// TODO: не очень оптимально так посимвольно собирать
+		String ident = Character.toString( curChar );
+		
+		// если символ из алфавита, то добавляем к строке
+		while( Character.isAlphabetic( peekCharFromBuffer(0) ) ){
+			ident += buffer.getChar(); //TODO подозрительно
+		}
+		
+		// может быть вплотную допустимый служебный символ, тогда всё нормально
+		if( ! isEndSourceCode ){ // может быть окончание потока
+			// TODO кинуть ошибку, такого не должно быть 
+		}else{
+			char nextChar = (char) peekCharFromBuffer( 0 );
+			switch (nextChar) {
+			case ' ':
+			// сразу знак арифметического выражения
+			case '+':
+			case '-':
+			case '*':
+			case '/':
+			case '^':
+			// всякая пунктуация
+			case '(':
+			case ')':
+			case '{':
+			case ',':
+			case ';':
+				break;
+			default:
+				// TODO: какая-то фигня впритык, кинуть ошибку
+				break;
+			}
+		}
+		
+		// TODO: нужно для каждого служебного слова определить возможные впритык следующие символы(они разные)
+		Token<?> result = null;
+		//определение служебное ли это слово
+		if( ident.equals( "return" ) ){
+			result = new Token<>( TokenType.RETURN );
+		} else if( ident.equals( "int" ) ){
+			result = new Token<>( TokenType.INT );
+		} else if( ident.equals( "double" ) ){
+			result = new Token<>( TokenType.DOUBLE );
+		} else{
+			result = new Token<String>( TokenType.NAME, ident );
+		}
+		
+		return result;
+	}
+
 	
 	// функция обёртка, которая определяет конец потока символов
 	// аргумент - {0,1} - какой символ вперёд хотим взять

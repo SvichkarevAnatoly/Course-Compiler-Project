@@ -15,7 +15,7 @@ public class Parser {
 	public Node parseProgram(){
 		// TODO: у программы нет ничего в содержимом
 		//это просто список функций
-		Node result = new Node( new Token<>( TokenType.PROGRAM ) );
+		Node result = new Node( TokenType.PROGRAM );
 
 		//правило вывода:
 		//functionList -> function functionList | E вырождается
@@ -39,7 +39,7 @@ public class Parser {
 		// если конец исходника, значит функций дальше нет,
 		//возвращаем пустоту
 		if( emptyToken.match( TokenType.END ) ){
-			return new Node( new Token<Object>( TokenType.EMPTY ) );
+			return new Node( TokenType.EMPTY );
 		}
 		
 		// TODO: оптимизация
@@ -92,13 +92,15 @@ public class Parser {
 		Token<?> closeBracketToken = lexer.peekToken();
 		// если вернуло закрывающуюся скобку, то вернём пустоту
 		if( closeBracketToken.match( TokenType.BRACKET_CLOSE ) ){
-			return new Node( new Token<Object>( TokenType.EMPTY ) );
+			Node emptyParList = new Node( TokenType.PARAMS_LIST );
+			emptyParList.setLeft( new Node( TokenType.EMPTY ) );
+			return emptyParList;
 		}
 		
 		// иначе начинаем парсить аргументы
 		// считываем несколько токенов и сверяем типы, должно быть точное совпадение
 		// если будет запятая, то дальше идёт по идее ещё аргумент
-		Node result = new Node( new Token<>( TokenType.PARAMS_LIST ) ); //TODO: так можно?
+		Node result = new Node( TokenType.PARAMS_LIST ); //TODO: так можно?
 		Token<?> commaToken;
 		do{
 			Node typeNode = parseType();
@@ -122,12 +124,12 @@ public class Parser {
 	}
 	
 	public Node parseBody(){
-		Node result = new Node( new Token<>( TokenType.BODY ) );
+		Node result = new Node( TokenType.BODY );
 		// проверка на пустое тело
 		Token<?> closeBraceToken = lexer.peekToken();
 		// если вернуло закрывающуюся фигурную скобку, то вернём пустоту
 		if( closeBraceToken.match( TokenType.BRACE_CLOSE ) ){
-			result.setLeft( new Node( new Token<>( TokenType.EMPTY ) ) );
+			result.setLeft( new Node( TokenType.EMPTY ) );
 			return result;
 		}
 		
@@ -148,7 +150,7 @@ public class Parser {
 	}
 	
 	public Node parseCommand(){
-		Node result = new Node( new Token<>( TokenType.COMMAND ) );
+		Node result = new Node( TokenType.COMMAND );
 		
 		Token<?> whatEver = lexer.getToken();
 		switch( whatEver.getTokenType() ){
@@ -193,11 +195,11 @@ public class Parser {
 		Token<?> closeBracketToken = lexer.peekToken();
 		// если вернуло закрывающуюся скобку, то вернём пустоту
 		if( closeBracketToken.match( TokenType.BRACKET_CLOSE ) ){
-			return new Node( new Token<Object>( TokenType.EMPTY ) );
+			return new Node( TokenType.EMPTY );
 		}
 		
 		// иначе начинаем парсить
-		Node result = new Node( new Token<>( TokenType.ARG_LIST ) );
+		Node result = new Node( TokenType.ARG_LIST );
 		
 		Token<?> commaToken;
 		do{
@@ -220,7 +222,7 @@ public class Parser {
 		    typeToken.match( TokenType.DOUBLE )){
 			
 			Node specificType = new Node( typeToken );
-			result = new Node( new Token<>(TokenType.TYPE) );
+			result = new Node( TokenType.TYPE );
 			result.setLeft( specificType );
 		}else{
 			// TODO: кинуть ошибку
@@ -333,7 +335,7 @@ public class Parser {
 			if( nextToken.match( TokenType.BRACKET_OPEN ) ){
 				// значит это вызов функции
 				lexer.getToken();
-				result = new Node( new Token<>( TokenType.CALL_FUNCTION ) );
+				result = new Node( TokenType.CALL_FUNCTION );
 				result.setLeft( new Node( token ) );
 				result.setRight( parseArgList() );
 				

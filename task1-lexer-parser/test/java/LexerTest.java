@@ -95,6 +95,53 @@ public class LexerTest extends Assert {
 	}
 	
 	@Test
+	public void testReturn(){
+		Buffer buffer = new Buffer( new StringReader( "return;" ) );
+		Lexer lexer = new Lexer( buffer );
+		
+		Token<?> token1 = lexer.getToken();
+		assertEquals( TokenType.RETURN, token1.getTokenType() );
+	}
+	
+	@Test
+	public void testInt(){
+		Buffer buffer = new Buffer( new StringReader( "int " ) );
+		Lexer lexer = new Lexer( buffer );
+		
+		Token<?> token1 = lexer.getToken();
+		assertEquals( TokenType.INT, token1.getTokenType() );
+	}
+	
+	@Test
+	public void testDouble(){
+		Buffer buffer = new Buffer( new StringReader( "double " ) );
+		Lexer lexer = new Lexer( buffer );
+		
+		Token<?> token1 = lexer.getToken();
+		assertEquals( TokenType.DOUBLE, token1.getTokenType() );
+	}
+	
+	@Test
+	public void testName1(){
+		Buffer buffer = new Buffer( new StringReader( "foo " ) );
+		Lexer lexer = new Lexer( buffer );
+		
+		Token<?> token1 = lexer.getToken();
+		assertEquals( TokenType.NAME, token1.getTokenType() );
+		assertEquals( "foo", token1.getTokenValue() );
+	}
+	
+	@Test
+	public void testName2(){
+		Buffer buffer = new Buffer( new StringReader( "_bar " ) );
+		Lexer lexer = new Lexer( buffer );
+		
+		Token<?> token1 = lexer.getToken();
+		assertEquals( TokenType.NAME, token1.getTokenType() );
+		assertEquals( "_bar", token1.getTokenValue() );
+	}
+	
+	@Test
 	public void testEnd(){
 		Buffer buffer = new Buffer( new StringReader( "" ) );
 		Lexer lexer = new Lexer( buffer );

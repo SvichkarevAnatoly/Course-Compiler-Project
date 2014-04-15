@@ -28,7 +28,7 @@ public class ParserFullTest extends Assert {
 		assertEquals( tree, parser.parseProgram() );
 	}
 	
-	/*@Test
+	@Test
 	public void testOneEmptyFunctionProgram() {
 		Buffer buffer = new Buffer( new StringReader(
 				"int main(){}" ) );
@@ -41,15 +41,30 @@ public class ParserFullTest extends Assert {
 		Token<?> programToken = new Token<>( TokenType.PROGRAM );
 		Node tree = new Node( programToken );
 		
-		// собираем функцию
-		Node functionNode = new Node( TokenType.FUNCTION );
+		Node functionNode = new Node( new Token<>( TokenType.FUNCTION, "main" ) );
 		
-		//tree.setLeft( new Node( TokenType.EMPTY ) ) );
+		// возвращаемый тип
+		Node typeNode = new Node( TokenType.TYPE );
+		typeNode.setLeft( new Node( TokenType.INT ) );
+		
+		// список аргументов
+		Node paramListNode = new Node( TokenType.PARAMS_LIST );
+		paramListNode.setLeft( new Node( TokenType.EMPTY ) );
+		
+		// тело
+		Node bodyNode = new Node( TokenType.BODY );
+		bodyNode.setLeft( new Node( TokenType.EMPTY ) );
+		
+		// собираем функцию 
+		functionNode.setLeft( typeNode );
+		functionNode.setRight( paramListNode );
+		functionNode.setRight( bodyNode );
+		
+		// добавляем к дереву
+		tree.setLeft( functionNode );
 		
 		assertEquals( tree, realTree );
-	}*/
-	
-	
+	}
 	
 	/*
 	@Test
