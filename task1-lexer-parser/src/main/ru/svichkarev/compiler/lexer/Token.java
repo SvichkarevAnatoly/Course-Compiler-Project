@@ -4,17 +4,29 @@ public class Token<T>{
 	private TokenType type;
 	private T value;
 	
-	public Token( TokenType type1, T value ){
-		this.type = type1;
+	public Token( TokenType type, T value ){
+		this.type = type;
 		this.value = value; 
 	}
 
+	// TODO: заменить на упрощённые
+	// упрощённый токен
+	public Token( TokenType type ){
+		this.type = type;
+		this.value = null; 
+	}
+	
 	public T getTokenValue(){
 		return value;
 	}
 
 	public TokenType getTokenType(){
 		return type;
+	}
+	
+	// метод проверки типа
+	public boolean match( TokenType etalon ){
+		return (this.getTokenType() == etalon);
 	}
 	
 	@Override

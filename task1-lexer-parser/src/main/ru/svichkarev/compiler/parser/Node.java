@@ -8,6 +8,7 @@ import java.util.ListIterator;
 import java.util.concurrent.ArrayBlockingQueue;
 
 import main.ru.svichkarev.compiler.lexer.Token;
+import main.ru.svichkarev.compiler.lexer.TokenType;
 
 public class Node {
 	private Token<?> value;
@@ -32,6 +33,11 @@ public class Node {
 		listChild.add( rightChild );
 	}
 
+	// метод сверки типов
+	public boolean match( TokenType type ){
+		return value.match( type );
+	}
+	
 	@Override
 	public boolean equals(Object obj) {
 		if (this == obj)
