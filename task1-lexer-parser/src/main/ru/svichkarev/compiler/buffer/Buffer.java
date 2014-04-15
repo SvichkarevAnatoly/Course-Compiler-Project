@@ -3,6 +3,7 @@ package main.ru.svichkarev.compiler.buffer;
 import java.io.Reader;
 
 public class Buffer {
+	final static int DEFAULT_SIZE_BUFFER = 10;
 	final static int END_OF_SOURCE_CODE = -1;
 	
 	private Reader reader;
@@ -13,7 +14,6 @@ public class Buffer {
 	
 	private boolean isEndSourseCode = false;
 	
-	//TODO: сделать конструктор с ёмкостью по-умолчанию
 	public Buffer( Reader reader, int capacity ) {
 		if( capacity < 2 ){
 			throw new IllegalArgumentException( "capacity must be more than 1" );
@@ -23,6 +23,11 @@ public class Buffer {
 		localBuf = new char[ capacity ];
 		
 		writeInBuffer();
+	}
+	
+	// конструктор без указания ёмкости буфера
+	public Buffer( Reader reader ){
+		this( reader, DEFAULT_SIZE_BUFFER );
 	}
 	
 	public char getChar() {
