@@ -13,11 +13,9 @@ import main.ru.svichkarev.compiler.parser.Parser;
 import org.junit.Test;
 
 public class ParserTest extends Assert {
-	private final int DEFAULT_SIZE = 10;
-	
 	@Test
 	public void testNumber1() {
-		Buffer buffer = new Buffer( new StringReader("5"), DEFAULT_SIZE );
+		Buffer buffer = new Buffer( new StringReader("5") );
 		Lexer lexer = new Lexer( buffer );
 		Parser parser = new Parser( lexer );
 		
@@ -30,7 +28,7 @@ public class ParserTest extends Assert {
 
 	@Test
 	public void testNumber2() {
-		Buffer buffer = new Buffer( new StringReader("54"), DEFAULT_SIZE );
+		Buffer buffer = new Buffer( new StringReader("54") );
 		Lexer lexer = new Lexer( buffer );
 		Parser parser = new Parser( lexer );
 		
@@ -43,13 +41,13 @@ public class ParserTest extends Assert {
 	
 	@Test
 	public void testNegativeNumber() {
-		Buffer buffer = new Buffer( new StringReader("-5"), DEFAULT_SIZE );
+		Buffer buffer = new Buffer( new StringReader("-5") );
 		Lexer lexer = new Lexer( buffer );
 		Parser parser = new Parser( lexer );
 		
 		//собираем дерево
 		Token<?> num = new Token<Integer>( TokenType.NUMBER, 5 );
-		Token<?> minus = new Token<String>( TokenType.MINUS, "-" );
+		Token<?> minus = new Token<String>( TokenType.MINUS );
 		Node numNode = new Node( num );
 		
 		Node tree = new Node( minus );
@@ -60,7 +58,7 @@ public class ParserTest extends Assert {
 	
 	@Test
 	public void testSpacesNumber() {
-		Buffer buffer = new Buffer( new StringReader("   5   "), DEFAULT_SIZE );
+		Buffer buffer = new Buffer( new StringReader("   5   ") );
 		Lexer lexer = new Lexer( buffer );
 		Parser parser = new Parser( lexer );
 		
@@ -73,13 +71,13 @@ public class ParserTest extends Assert {
 	
 	@Test
 	public void testMULTIPLICATION() {
-		Buffer buffer = new Buffer( new StringReader("5*2"), DEFAULT_SIZE );
+		Buffer buffer = new Buffer( new StringReader("5*2") );
 		Lexer lexer = new Lexer( buffer );
 		Parser parser = new Parser( lexer );
 		
 		//собираем дерево
 		Token<?> num1 = new Token<Integer>( TokenType.NUMBER, 5 );
-		Token<?> mul = new Token<String>( TokenType.MULTIPLICATION, "*" );
+		Token<?> mul = new Token<String>( TokenType.MULTIPLICATION );
 		Token<?> num2 = new Token<Integer>( TokenType.NUMBER, 2 );
 		
 		Node numNode1 = new Node( num1 );
@@ -94,15 +92,15 @@ public class ParserTest extends Assert {
 	
 	@Test
 	public void testManyMULTIPLICATION() {
-		Buffer buffer = new Buffer( new StringReader("5*2*3"), DEFAULT_SIZE );
+		Buffer buffer = new Buffer( new StringReader("5*2*3") );
 		Lexer lexer = new Lexer( buffer );
 		Parser parser = new Parser( lexer );
 		
 		// формируем токены
 		Token<?> num1 = new Token<Integer>( TokenType.NUMBER, 5 );
-		Token<?> mul1 = new Token<String>( TokenType.MULTIPLICATION, "*" );
+		Token<?> mul1 = new Token<String>( TokenType.MULTIPLICATION );
 		Token<?> num2 = new Token<Integer>( TokenType.NUMBER, 2 );
-		Token<?> mul2 = new Token<String>( TokenType.MULTIPLICATION, "*" );
+		Token<?> mul2 = new Token<String>( TokenType.MULTIPLICATION );
 		Token<?> num3 = new Token<Integer>( TokenType.NUMBER, 3 );
 		
 		
@@ -125,13 +123,13 @@ public class ParserTest extends Assert {
 	
 	@Test
 	public void testDIVISION() {
-		Buffer buffer = new Buffer( new StringReader("20/2"), DEFAULT_SIZE );
+		Buffer buffer = new Buffer( new StringReader("20/2") );
 		Lexer lexer = new Lexer( buffer );
 		Parser parser = new Parser( lexer );
 		
 		//собираем дерево
 		Token<?> num1 = new Token<Integer>( TokenType.NUMBER, 20 );
-		Token<?> div = new Token<String>( TokenType.DIVISION, "/" );
+		Token<?> div = new Token<String>( TokenType.DIVISION );
 		Token<?> num2 = new Token<Integer>( TokenType.NUMBER, 2 );
 		
 		Node numNode1 = new Node( num1 );
@@ -146,15 +144,15 @@ public class ParserTest extends Assert {
 	
 	@Test
 	public void testManyDIVISION() {
-		Buffer buffer = new Buffer( new StringReader("20/2/5"), DEFAULT_SIZE );
+		Buffer buffer = new Buffer( new StringReader("20/2/5") );
 		Lexer lexer = new Lexer( buffer );
 		Parser parser = new Parser( lexer );
 		
 		// формируем токены
 		Token<?> num1 = new Token<Integer>( TokenType.NUMBER, 20 );
-		Token<?> div1 = new Token<String>( TokenType.DIVISION, "/" );
+		Token<?> div1 = new Token<String>( TokenType.DIVISION );
 		Token<?> num2 = new Token<Integer>( TokenType.NUMBER, 2 );
-		Token<?> div2 = new Token<String>( TokenType.DIVISION, "/" );
+		Token<?> div2 = new Token<String>( TokenType.DIVISION );
 		Token<?> num3 = new Token<Integer>( TokenType.NUMBER, 5 );
 		
 		
@@ -177,13 +175,13 @@ public class ParserTest extends Assert {
 	
 	@Test
 	public void testEXPONENTIATION() {
-		Buffer buffer = new Buffer( new StringReader("2^3"), DEFAULT_SIZE );
+		Buffer buffer = new Buffer( new StringReader("2^3") );
 		Lexer lexer = new Lexer( buffer );
 		Parser parser = new Parser( lexer );
 		
 		//собираем дерево
 		Token<?> num1 = new Token<Integer>( TokenType.NUMBER, 2 );
-		Token<?> exp = new Token<String>( TokenType.EXPONENTIATION, "^" );
+		Token<?> exp = new Token<String>( TokenType.EXPONENTIATION );
 		Token<?> num2 = new Token<Integer>( TokenType.NUMBER, 3 );
 		
 		Node numNode1 = new Node( num1 );
@@ -198,15 +196,15 @@ public class ParserTest extends Assert {
 	
 	@Test
 	public void testManyEXPONENTIATION() {
-		Buffer buffer = new Buffer( new StringReader("2^3^4"), DEFAULT_SIZE );
+		Buffer buffer = new Buffer( new StringReader("2^3^4") );
 		Lexer lexer = new Lexer( buffer );
 		Parser parser = new Parser( lexer );
 		
 		// формируем токены
 		Token<?> num1 = new Token<Integer>( TokenType.NUMBER, 2 );
-		Token<?> exp1 = new Token<String>( TokenType.EXPONENTIATION, "^" );
+		Token<?> exp1 = new Token<String>( TokenType.EXPONENTIATION );
 		Token<?> num2 = new Token<Integer>( TokenType.NUMBER, 3 );
-		Token<?> exp2 = new Token<String>( TokenType.EXPONENTIATION, "^" );
+		Token<?> exp2 = new Token<String>( TokenType.EXPONENTIATION );
 		Token<?> num3 = new Token<Integer>( TokenType.NUMBER, 4 );
 		
 		
@@ -229,13 +227,13 @@ public class ParserTest extends Assert {
 	
 	@Test
 	public void testUnaryMINUS() {
-		Buffer buffer = new Buffer( new StringReader("-2"), DEFAULT_SIZE );
+		Buffer buffer = new Buffer( new StringReader("-2") );
 		Lexer lexer = new Lexer( buffer );
 		Parser parser = new Parser( lexer );
 		
 		// формируем токены
 		Token<?> num = new Token<Integer>( TokenType.NUMBER, 2 );
-		Token<?> minus = new Token<String>( TokenType.MINUS, "-" );
+		Token<?> minus = new Token<String>( TokenType.MINUS );
 		
 		//собираем дерево
 		Node numNode = new Node( num );
@@ -247,7 +245,7 @@ public class ParserTest extends Assert {
 	
 	@Test
 	public void testBRACKET() {
-		Buffer buffer = new Buffer( new StringReader("(2)"), DEFAULT_SIZE );
+		Buffer buffer = new Buffer( new StringReader("(2)") );
 		Lexer lexer = new Lexer( buffer );
 		Parser parser = new Parser( lexer );
 		
@@ -260,7 +258,7 @@ public class ParserTest extends Assert {
 	
 	@Test
 	public void testManyBRACKET() {
-		Buffer buffer = new Buffer( new StringReader("(((2)))"), DEFAULT_SIZE );
+		Buffer buffer = new Buffer( new StringReader("(((2)))") );
 		Lexer lexer = new Lexer( buffer );
 		Parser parser = new Parser( lexer );
 		
@@ -273,15 +271,15 @@ public class ParserTest extends Assert {
 	
 	@Test
 	public void testBRACKETandMULTIPLICATION() {
-		Buffer buffer = new Buffer( new StringReader("(2+3)*2"), DEFAULT_SIZE );
+		Buffer buffer = new Buffer( new StringReader("(2+3)*2") );
 		Lexer lexer = new Lexer( buffer );
 		Parser parser = new Parser( lexer );
 		
 		// формируем токены
 		Token<?> num1 = new Token<Integer>( TokenType.NUMBER, 2 );
-		Token<?> plus = new Token<String>( TokenType.PLUS, "+" );
+		Token<?> plus = new Token<String>( TokenType.PLUS );
 		Token<?> num2 = new Token<Integer>( TokenType.NUMBER, 3 );
-		Token<?> mul = new Token<String>( TokenType.MULTIPLICATION, "*" );
+		Token<?> mul = new Token<String>( TokenType.MULTIPLICATION );
 		Token<?> num3 = new Token<Integer>( TokenType.NUMBER, 2 );
 		
 		
@@ -304,7 +302,7 @@ public class ParserTest extends Assert {
 	
 	@Test
 	public void testDoubleNumber() {
-		Buffer buffer = new Buffer( new StringReader("1.0001"), DEFAULT_SIZE );
+		Buffer buffer = new Buffer( new StringReader("1.0001") );
 		Lexer lexer = new Lexer( buffer );
 		Parser parser = new Parser( lexer );
 		

@@ -11,11 +11,9 @@ import main.ru.svichkarev.compiler.lexer.TokenType;
 import org.junit.Test;
 
 public class LexerTest extends Assert {
-	private final int DEFAULT_SIZE = 5;
-	
 	@Test
 	public void testNumber(){
-		Buffer buffer = new Buffer( new StringReader( "42" ), DEFAULT_SIZE );
+		Buffer buffer = new Buffer( new StringReader( "42" ));
 		Lexer lexer = new Lexer( buffer );
 		
 		Token<?> token1 = lexer.getToken();
@@ -25,7 +23,7 @@ public class LexerTest extends Assert {
 	
 	@Test
 	public void testNumberDouble(){
-		Buffer buffer = new Buffer( new StringReader( "42.042" ), DEFAULT_SIZE );
+		Buffer buffer = new Buffer( new StringReader( "42.042" ) );
 		Lexer lexer = new Lexer( buffer );
 		
 		Token<?> token1 = lexer.getToken();
@@ -35,107 +33,97 @@ public class LexerTest extends Assert {
 	
 	@Test
 	public void testPlus(){
-		Buffer buffer = new Buffer( new StringReader( "+" ), DEFAULT_SIZE );
+		Buffer buffer = new Buffer( new StringReader( "+" ) );
 		Lexer lexer = new Lexer( buffer );
 		
 		Token<?> token1 = lexer.getToken();
 		assertEquals( TokenType.PLUS, token1.getTokenType() );
-		assertEquals( "+", token1.getTokenValue() );
 	}
 	
 	@Test
 	public void testMinus(){
-		Buffer buffer = new Buffer( new StringReader( "-" ), DEFAULT_SIZE );
+		Buffer buffer = new Buffer( new StringReader( "-" ) );
 		Lexer lexer = new Lexer( buffer );
 		
 		Token<?> token1 = lexer.getToken();
 		assertEquals( TokenType.MINUS, token1.getTokenType() );
-		assertEquals( "-", token1.getTokenValue() );
 	}
 	
 	@Test
 	public void testMultiplication(){
-		Buffer buffer = new Buffer( new StringReader( "*" ), DEFAULT_SIZE );
+		Buffer buffer = new Buffer( new StringReader( "*" ) );
 		Lexer lexer = new Lexer( buffer );
 		
 		Token<?> token1 = lexer.getToken();
 		assertEquals( TokenType.MULTIPLICATION, token1.getTokenType() );
-		assertEquals( "*", token1.getTokenValue() );
 	}
 	
 	@Test
 	public void testDivision(){
-		Buffer buffer = new Buffer( new StringReader( "/" ), DEFAULT_SIZE );
+		Buffer buffer = new Buffer( new StringReader( "/" ) );
 		Lexer lexer = new Lexer( buffer );
 		
 		Token<?> token1 = lexer.getToken();
 		assertEquals( TokenType.DIVISION, token1.getTokenType() );
-		assertEquals( "/", token1.getTokenValue() );
 	}
 	
 	@Test
 	public void testExponential(){
-		Buffer buffer = new Buffer( new StringReader( "^" ), DEFAULT_SIZE );
+		Buffer buffer = new Buffer( new StringReader( "^" ) );
 		Lexer lexer = new Lexer( buffer );
 		
 		Token<?> token1 = lexer.getToken();
 		assertEquals( TokenType.EXPONENTIATION, token1.getTokenType() );
-		assertEquals( "^", token1.getTokenValue() );
 	}
 	
 	@Test
 	public void testBracketOpen(){
-		Buffer buffer = new Buffer( new StringReader( "(" ), DEFAULT_SIZE );
+		Buffer buffer = new Buffer( new StringReader( "(" ) );
 		Lexer lexer = new Lexer( buffer );
 		
 		Token<?> token1 = lexer.getToken();
 		assertEquals( TokenType.BRACKET_OPEN, token1.getTokenType() );
-		assertEquals( "(", token1.getTokenValue() );
 	}
 	
 	@Test
 	public void testBracketClose(){
-		Buffer buffer = new Buffer( new StringReader( ")" ), DEFAULT_SIZE );
+		Buffer buffer = new Buffer( new StringReader( ")" ) );
 		Lexer lexer = new Lexer( buffer );
 		
 		Token<?> token1 = lexer.getToken();
 		assertEquals( TokenType.BRACKET_CLOSE, token1.getTokenType() );
-		assertEquals( ")", token1.getTokenValue() );
 	}
 	
 	@Test
 	public void testEnd(){
-		Buffer buffer = new Buffer( new StringReader( "" ), DEFAULT_SIZE );
+		Buffer buffer = new Buffer( new StringReader( "" ) );
 		Lexer lexer = new Lexer( buffer );
 		
 		Token<?> token1 = lexer.getToken();
 		assertEquals( TokenType.END, token1.getTokenType() );
-		assertEquals( "End", token1.getTokenValue() );
 	}
 	
 	@Test
 	public void testCommentSingleLine(){
-		Buffer buffer = new Buffer( new StringReader( "//54 + 43" ), DEFAULT_SIZE );
+		Buffer buffer = new Buffer( new StringReader( "//54 + 43" ) );
 		Lexer lexer = new Lexer( buffer );
 		
 		Token<?> token1 = lexer.getToken();
 		assertEquals( TokenType.END, token1.getTokenType() );
-		assertEquals( "End", token1.getTokenValue() );
 	}
 	
 	@Test
 	public void testCommentMultiplyLine(){
-		Buffer buffer = new Buffer( new StringReader( "/*54 + 43*/  " ), DEFAULT_SIZE );
+		Buffer buffer = new Buffer( new StringReader( "/*54 + 43*/  " ) );
 		Lexer lexer = new Lexer( buffer );
 		
 		Token<?> token1 = lexer.getToken();
 		assertEquals( TokenType.END, token1.getTokenType() );
-		assertEquals( "End", token1.getTokenValue() );
 	}
 	
 	@Test
 	public void testEmptyLine() {
-		Buffer buffer = new Buffer( new StringReader( "  2  + 3  \n   " ), DEFAULT_SIZE );
+		Buffer buffer = new Buffer( new StringReader( "  2  + 3  \n   " ) );
 		Lexer lexer = new Lexer( buffer );
 		
 		Token<?> token1 = lexer.getToken();
@@ -144,7 +132,6 @@ public class LexerTest extends Assert {
 		
 		Token<?> token2 = lexer.getToken();
 		assertEquals( TokenType.PLUS, token2.getTokenType() );
-		assertEquals( "+", token2.getTokenValue() );
 		
 		Token<?> token3 = lexer.getToken();
 		assertEquals( TokenType.NUMBER, token3.getTokenType() );
@@ -152,16 +139,14 @@ public class LexerTest extends Assert {
 		
 		Token<?> token4 = lexer.getToken();
 		assertEquals( TokenType.END, token4.getTokenType() );
-		assertEquals( "End", token4.getTokenValue() );
 		
 		Token<?> token5 = lexer.getToken();
 		assertEquals( TokenType.END, token5.getTokenType() );
-		assertEquals( "End", token5.getTokenValue() );
 	}
 	
 	@Test
 	public void testManyLines() {
-		Buffer buffer = new Buffer( new StringReader( "  2 \n   +\n   3\n" ), DEFAULT_SIZE );
+		Buffer buffer = new Buffer( new StringReader( "  2 \n   +\n   3\n" ) );
 		Lexer lexer = new Lexer( buffer );
 		
 		Token<?> token1 = lexer.getToken();
@@ -170,7 +155,6 @@ public class LexerTest extends Assert {
 		
 		Token<?> token2 = lexer.getToken();
 		assertEquals( TokenType.PLUS, token2.getTokenType() );
-		assertEquals( "+", token2.getTokenValue() );
 		
 		Token<?> token3 = lexer.getToken();
 		assertEquals( TokenType.NUMBER, token3.getTokenType() );
@@ -178,16 +162,14 @@ public class LexerTest extends Assert {
 		
 		Token<?> token4 = lexer.getToken();
 		assertEquals( TokenType.END, token4.getTokenType() );
-		assertEquals( "End", token4.getTokenValue() );
 		
 		Token<?> token5 = lexer.getToken();
 		assertEquals( TokenType.END, token5.getTokenType() );
-		assertEquals( "End", token5.getTokenValue() );
 	}
 
 	@Test
 	public void testCommentSingleLine2() {
-		Buffer buffer = new Buffer( new StringReader( " 3 //2\n   + 4 " ), DEFAULT_SIZE );
+		Buffer buffer = new Buffer( new StringReader( " 3 //2\n   + 4 " ) );
 		Lexer lexer = new Lexer( buffer );
 		
 		Token<?> token1 = lexer.getToken();
@@ -196,7 +178,6 @@ public class LexerTest extends Assert {
 		
 		Token<?> token2 = lexer.getToken();
 		assertEquals( TokenType.PLUS, token2.getTokenType() );
-		assertEquals( "+", token2.getTokenValue() );
 		
 		Token<?> token3 = lexer.getToken();
 		assertEquals( TokenType.NUMBER, token3.getTokenType() );
@@ -204,18 +185,14 @@ public class LexerTest extends Assert {
 		
 		Token<?> token4 = lexer.getToken();
 		assertEquals( TokenType.END, token4.getTokenType() );
-		assertEquals( "End", token4.getTokenValue() );
 		
 		Token<?> token5 = lexer.getToken();
 		assertEquals( TokenType.END, token5.getTokenType() );
-		assertEquals( "End", token5.getTokenValue() );
 	}
-	
-	
 	
 	@Test
 	public void testCommentMultiplyLineComplex() {
-		Buffer buffer = new Buffer( new StringReader( " /* 56  */  3  /* 123123 123123 1123 13123 1313 13131 13 131  3131 3123 112*/    /**//*2\n   */+ 4 /**/\n" ), DEFAULT_SIZE );
+		Buffer buffer = new Buffer( new StringReader( " /* 56  */  3  /* 123123 123123 1123 13123 1313 13131 13 131  3131 3123 112*/    /**//*2\n   */+ 4 /**/\n" ) );
 		Lexer lexer = new Lexer( buffer );
 		
 		Token<?> token1 = lexer.getToken();
@@ -224,7 +201,6 @@ public class LexerTest extends Assert {
 		
 		Token<?> token2 = lexer.getToken();
 		assertEquals( TokenType.PLUS, token2.getTokenType() );
-		assertEquals( "+", token2.getTokenValue() );
 		
 		Token<?> token3 = lexer.getToken();
 		assertEquals( TokenType.NUMBER, token3.getTokenType() );
@@ -232,10 +208,8 @@ public class LexerTest extends Assert {
 		
 		Token<?> token4 = lexer.getToken();
 		assertEquals( TokenType.END, token4.getTokenType() );
-		assertEquals( "End", token4.getTokenValue() );
 		
 		Token<?> token5 = lexer.getToken();
 		assertEquals( TokenType.END, token5.getTokenType() );
-		assertEquals( "End", token5.getTokenValue() );
 	}	
 }

@@ -49,30 +49,30 @@ public class Lexer {
 		char curChar = buffer.getChar();
 		switch (curChar) {
 		case '+':
-			currentToken = new Token<String>( TokenType.PLUS, "+" );
+			currentToken = new Token<>( TokenType.PLUS );
 			break;
 		case '-':
-			currentToken = new Token<String>( TokenType.MINUS, "-" );
+			currentToken = new Token<>( TokenType.MINUS );
 			break;
 		case '*':
-			currentToken = new Token<String>( TokenType.MULTIPLICATION, "*" );
+			currentToken = new Token<>( TokenType.MULTIPLICATION );
 			break;
 		case '/':
-			currentToken = new Token<String>( TokenType.DIVISION, "/" );
+			currentToken = new Token<>( TokenType.DIVISION );
 			break;
 		case '^':
-			currentToken = new Token<String>( TokenType.EXPONENTIATION, "^" );
+			currentToken = new Token<>( TokenType.EXPONENTIATION );
 			break;
 		case '(':
-			currentToken = new Token<String>( TokenType.BRACKET_OPEN, "(" );
+			currentToken = new Token<>( TokenType.BRACKET_OPEN );
 			break;
 		case ')':
-			currentToken = new Token<String>( TokenType.BRACKET_CLOSE, ")" );
+			currentToken = new Token<>( TokenType.BRACKET_CLOSE );
 			break;
 		default:
 			// могут быть пробелы до конца
 			if( isEndSourceCode ){
-				currentToken = new Token<String>( TokenType.END , "End" );
+				currentToken = new Token<>( TokenType.END );
 				return;
 			}
 			
