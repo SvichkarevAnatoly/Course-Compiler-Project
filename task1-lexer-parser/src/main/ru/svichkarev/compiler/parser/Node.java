@@ -39,6 +39,11 @@ public class Node {
 		listChild.add( rightChild );
 	}
 
+	// TODO: нужно более высокоуровневый метод предоставить(поиск допустим), а не такой
+	public List<Node> getChildren(){
+		return listChild;
+	}
+	
 	// метод сверки типов
 	public boolean match( TokenType type ){
 		return value.match( type );
