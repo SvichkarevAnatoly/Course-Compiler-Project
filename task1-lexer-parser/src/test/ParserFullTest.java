@@ -1,19 +1,18 @@
-package test.java;
+package test;
 
-import java.io.StringReader;
-
-import junit.framework.Assert;
+import junit.framework.TestCase;
 import main.ru.svichkarev.compiler.buffer.Buffer;
 import main.ru.svichkarev.compiler.lexer.Lexer;
 import main.ru.svichkarev.compiler.lexer.Token;
 import main.ru.svichkarev.compiler.lexer.TokenType;
 import main.ru.svichkarev.compiler.parser.Node;
 import main.ru.svichkarev.compiler.parser.Parser;
-
 import org.junit.Test;
 
+import java.io.StringReader;
+
 // тестирование полной программы
-public class ParserFullTest extends Assert {
+public class ParserFullTest extends TestCase {
 	@Test
 	public void testEmptyProgram() {
 		Buffer buffer = new Buffer( new StringReader("") );
@@ -21,7 +20,7 @@ public class ParserFullTest extends Assert {
 		Parser parser = new Parser( lexer );
 		
 		//собираем дерево
-		Token<?> programToken = new Token<>( TokenType.PROGRAM );
+		Token<?> programToken = new Token<Object>( TokenType.PROGRAM );
 		Node tree = new Node( programToken );
 		tree.setLeft( new Node( TokenType.EMPTY ) );
 		
@@ -38,10 +37,10 @@ public class ParserFullTest extends Assert {
 		Node realTree = parser.parseProgram();
 		
 		//собираем дерево
-		Token<?> programToken = new Token<>( TokenType.PROGRAM );
+		Token<?> programToken = new Token<Object>( TokenType.PROGRAM );
 		Node tree = new Node( programToken );
 		
-		Node functionNode = new Node( new Token<>( TokenType.FUNCTION, "main" ) );
+		Node functionNode = new Node( new Token<Object>( TokenType.FUNCTION, "main" ) );
 		
 		// возвращаемый тип
 		Node typeNode = new Node( TokenType.TYPE );
@@ -79,10 +78,10 @@ public class ParserFullTest extends Assert {
 		Node realTree = parser.parseProgram();
 		
 		//собираем дерево
-		Token<?> programToken = new Token<>( TokenType.PROGRAM );
+		Token<?> programToken = new Token<Object>( TokenType.PROGRAM );
 		Node tree = new Node( programToken );
 		
-		Node functionNode = new Node( new Token<>( TokenType.FUNCTION, "main" ) );
+		Node functionNode = new Node( new Token<Object>( TokenType.FUNCTION, "main" ) );
 		
 		// возвращаемый тип
 		Node typeNode = new Node( TokenType.TYPE );
@@ -99,10 +98,10 @@ public class ParserFullTest extends Assert {
 		Node typeCommand1Node = new Node( TokenType.TYPE );
 		typeCommand1Node.setLeft( new Node( TokenType.INT ) );
 		command1Node.setLeft( typeCommand1Node );
-		command1Node.setRight( new Node( new Token<>( TokenType.NAME, "a" ) ) );
+		command1Node.setRight( new Node( new Token<Object>( TokenType.NAME, "a" ) ) );
 		// вторая команда
 		Node command2Node = new Node( TokenType.COMMAND );
-		command2Node.setLeft( new Node( new Token<>( TokenType.NAME, "a" ) ) );
+		command2Node.setLeft( new Node( new Token<Object>( TokenType.NAME, "a" ) ) );
 		command2Node.setRight( new Node( TokenType.ASSIGNMENT ) );
 		command2Node.setRight( new Node( new Token<Integer>( TokenType.NUMBER, 45 ) ) );
 		
@@ -135,10 +134,10 @@ public class ParserFullTest extends Assert {
 		Node realTree = parser.parseProgram();
 		
 		//собираем дерево
-		Token<?> programToken = new Token<>( TokenType.PROGRAM );
+		Token<?> programToken = new Token<Object>( TokenType.PROGRAM );
 		Node tree = new Node( programToken );
 		
-		Node functionNode = new Node( new Token<>( TokenType.FUNCTION, "main" ) );
+		Node functionNode = new Node( new Token<Object>( TokenType.FUNCTION, "main" ) );
 		
 		// возвращаемый тип
 		Node typeNode = new Node( TokenType.TYPE );
@@ -155,16 +154,16 @@ public class ParserFullTest extends Assert {
 		Node typeCommand1Node = new Node( TokenType.TYPE );
 		typeCommand1Node.setLeft( new Node( TokenType.INT ) );
 		command1Node.setLeft( typeCommand1Node );
-		command1Node.setRight( new Node( new Token<>( TokenType.NAME, "a" ) ) );
+		command1Node.setRight( new Node( new Token<Object>( TokenType.NAME, "a" ) ) );
 		// вторая команда
 		Node command2Node = new Node( TokenType.COMMAND );
-		command2Node.setLeft( new Node( new Token<>( TokenType.NAME, "a" ) ) );
+		command2Node.setLeft( new Node( new Token<Object>( TokenType.NAME, "a" ) ) );
 		command2Node.setRight( new Node( TokenType.ASSIGNMENT ) );
 		command2Node.setRight( new Node( new Token<Integer>( TokenType.NUMBER, 45 ) ) );
 		// третья команда
 		Node command3Node = new Node( TokenType.COMMAND );
 		command3Node.setLeft( new Node( TokenType.PRINT ) );
-		command3Node.setRight( new Node( new Token<>( TokenType.NAME, "a" ) ) );
+		command3Node.setRight( new Node( new Token<Object>( TokenType.NAME, "a" ) ) );
 		
 		bodyNode.setLeft( command1Node );
 		bodyNode.setRight( command2Node );

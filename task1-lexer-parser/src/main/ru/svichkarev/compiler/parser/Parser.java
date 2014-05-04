@@ -109,7 +109,7 @@ public class Parser {
 				// TODO: кинуть ошибку
 			}
 			// выделили один параметр, добавляем в список
-			Node newParam = new Node( new Token<>( TokenType.PARAM, (String) nameToken.getTokenValue() ) );
+			Node newParam = new Node( new Token<Object>( TokenType.PARAM, (String) nameToken.getTokenValue() ) );
 			result.setRight( newParam );
 			
 			commaToken = lexer.peekToken();

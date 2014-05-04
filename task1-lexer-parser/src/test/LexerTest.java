@@ -1,16 +1,15 @@
-package test.java;
+package test;
 
-import java.io.StringReader;
-
-import junit.framework.Assert;
+import junit.framework.TestCase;
 import main.ru.svichkarev.compiler.buffer.Buffer;
 import main.ru.svichkarev.compiler.lexer.Lexer;
 import main.ru.svichkarev.compiler.lexer.Token;
 import main.ru.svichkarev.compiler.lexer.TokenType;
-
 import org.junit.Test;
 
-public class LexerTest extends Assert {
+import java.io.StringReader;
+
+public class LexerTest extends TestCase {
 	@Test
 	public void testNumber(){
 		Buffer buffer = new Buffer( new StringReader( "42" ));

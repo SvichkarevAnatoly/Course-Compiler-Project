@@ -49,40 +49,40 @@ public class Lexer {
 		char curChar = buffer.getChar();
 		switch (curChar) {
 		case '+':
-			currentToken = new Token<>( TokenType.PLUS );
+			currentToken = new Token<Object>( TokenType.PLUS );
 			break;
 		case '-':
-			currentToken = new Token<>( TokenType.MINUS );
+			currentToken = new Token<Object>( TokenType.MINUS );
 			break;
 		case '*':
-			currentToken = new Token<>( TokenType.MULTIPLICATION );
+			currentToken = new Token<Object>( TokenType.MULTIPLICATION );
 			break;
 		case '/':
-			currentToken = new Token<>( TokenType.DIVISION );
+			currentToken = new Token<Object>( TokenType.DIVISION );
 			break;
 		case '^':
-			currentToken = new Token<>( TokenType.EXPONENTIATION );
+			currentToken = new Token<Object>( TokenType.EXPONENTIATION );
 			break;
 		case '(':
-			currentToken = new Token<>( TokenType.BRACKET_OPEN );
+			currentToken = new Token<Object>( TokenType.BRACKET_OPEN );
 			break;
 		case ')':
-			currentToken = new Token<>( TokenType.BRACKET_CLOSE );
+			currentToken = new Token<Object>( TokenType.BRACKET_CLOSE );
 			break;
 		case '{':
-			currentToken = new Token<>( TokenType.BRACE_OPEN );
+			currentToken = new Token<Object>( TokenType.BRACE_OPEN );
 			break;
 		case '}':
-			currentToken = new Token<>( TokenType.BRACE_CLOSE );
+			currentToken = new Token<Object>( TokenType.BRACE_CLOSE );
 			break;
 		case ',':
-			currentToken = new Token<>( TokenType.COMMA );
+			currentToken = new Token<Object>( TokenType.COMMA );
 			break;
 		case ';':
-			currentToken = new Token<>( TokenType.SEMICOLON );
+			currentToken = new Token<Object>( TokenType.SEMICOLON );
 			break;
 		case '=':
-			currentToken = new Token<>( TokenType.ASSIGNMENT );
+			currentToken = new Token<Object>( TokenType.ASSIGNMENT );
 			break;
 			
 		default:
@@ -253,13 +253,13 @@ public class Lexer {
 		Token<?> result = null;
 		//определение служебное ли это слово
 		if( ident.equals( "return" ) ){
-			result = new Token<>( TokenType.RETURN );
+			result = new Token<Object>( TokenType.RETURN );
 		} else if( ident.equals( "int" ) ){
-			result = new Token<>( TokenType.INT );
+			result = new Token<Object>( TokenType.INT );
 		} else if( ident.equals( "double" ) ){
-			result = new Token<>( TokenType.DOUBLE );
+			result = new Token<Object>( TokenType.DOUBLE );
 		} else if( ident.equals( "print" ) ){
-			result = new Token<>( TokenType.PRINT );
+			result = new Token<Object>( TokenType.PRINT );
 		} else{
 			result = new Token<String>( TokenType.NAME, ident );
 		}

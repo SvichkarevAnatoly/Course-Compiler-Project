@@ -1,18 +1,17 @@
-package test.java;
+package test;
 
-import java.io.StringReader;
-
-import junit.framework.Assert;
+import junit.framework.TestCase;
 import main.ru.svichkarev.compiler.buffer.Buffer;
 import main.ru.svichkarev.compiler.lexer.Lexer;
 import main.ru.svichkarev.compiler.lexer.Token;
 import main.ru.svichkarev.compiler.lexer.TokenType;
 import main.ru.svichkarev.compiler.parser.Node;
 import main.ru.svichkarev.compiler.parser.Parser;
-
 import org.junit.Test;
 
-public class ParserTest extends Assert {
+import java.io.StringReader;
+
+public class ParserTest extends TestCase {
 	@Test
 	public void testNumber1() {
 		Buffer buffer = new Buffer( new StringReader("5") );

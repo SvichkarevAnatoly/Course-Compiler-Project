@@ -25,7 +25,7 @@ public class Node {
 	
 	// для более простого создания нетерминалов
 	public Node( TokenType typeValue ) {
-		value = new Token<>( typeValue );
+		value = new Token<Object>( typeValue );
 		listChild = new ArrayList< Node >();
 	}
 	
