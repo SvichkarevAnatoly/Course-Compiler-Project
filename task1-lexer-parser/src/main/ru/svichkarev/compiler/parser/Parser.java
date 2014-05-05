@@ -24,6 +24,7 @@ public class Parser {
 		
 		// цикл - пока получается вытаскивать функцию,
 		//если вернёт пусто, то останавливаемся
+        // TODO: переписать на do - while
 		Node curFunction = parseFunction();
 		while( ! curFunction.match( TokenType.EMPTY ) ){
 			result.setRight( curFunction );
@@ -109,7 +110,8 @@ public class Parser {
 				// TODO: кинуть ошибку
 			}
 			// выделили один параметр, добавляем в список
-			Node newParam = new Node( new Token<Object>( TokenType.PARAM, (String) nameToken.getTokenValue() ) );
+			Node newParam = new Node( new Token<String>( TokenType.PARAM, (String) nameToken.getTokenValue() ) );
+            newParam.setLeft( typeNode );
 			result.setRight( newParam );
 			
 			commaToken = lexer.peekToken();

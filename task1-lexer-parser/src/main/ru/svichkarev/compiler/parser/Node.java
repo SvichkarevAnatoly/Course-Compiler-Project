@@ -1,14 +1,10 @@
 package main.ru.svichkarev.compiler.parser;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Iterator;
-import java.util.List;
-import java.util.ListIterator;
-import java.util.concurrent.ArrayBlockingQueue;
-
 import main.ru.svichkarev.compiler.lexer.Token;
 import main.ru.svichkarev.compiler.lexer.TokenType;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class Node {
 	private Token<?> value;
@@ -79,4 +75,6 @@ public class Node {
 		
 		return true;
 	}
+
+    // TODO: можно попробовать перегрузить метод toString()
 }

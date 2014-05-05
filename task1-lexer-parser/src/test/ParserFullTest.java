@@ -44,7 +44,7 @@ public class ParserFullTest extends TestCase {
 		
 		// возвращаемый тип
 		Node typeNode = new Node( TokenType.TYPE );
-		typeNode.setLeft( new Node( TokenType.INT ) );
+		typeNode.setLeft( new Node( new Token<String>( TokenType.INT, "I" ) ) );
 		
 		// список аргументов
 		Node paramListNode = new Node( TokenType.PARAMS_LIST );
@@ -85,7 +85,7 @@ public class ParserFullTest extends TestCase {
 		
 		// возвращаемый тип
 		Node typeNode = new Node( TokenType.TYPE );
-		typeNode.setLeft( new Node( TokenType.INT ) );
+		typeNode.setLeft( new Node( new Token<String>( TokenType.INT, "I" ) ) );
 		
 		// список аргументов
 		Node paramListNode = new Node( TokenType.PARAMS_LIST );
@@ -96,7 +96,7 @@ public class ParserFullTest extends TestCase {
 		// первая команда
 		Node command1Node = new Node( TokenType.COMMAND );
 		Node typeCommand1Node = new Node( TokenType.TYPE );
-		typeCommand1Node.setLeft( new Node( TokenType.INT ) );
+		typeCommand1Node.setLeft( new Node( new Token<String>( TokenType.INT, "I" ) ) );
 		command1Node.setLeft( typeCommand1Node );
 		command1Node.setRight( new Node( new Token<Object>( TokenType.NAME, "a" ) ) );
 		// вторая команда
@@ -141,7 +141,7 @@ public class ParserFullTest extends TestCase {
 		
 		// возвращаемый тип
 		Node typeNode = new Node( TokenType.TYPE );
-		typeNode.setLeft( new Node( TokenType.INT ) );
+		typeNode.setLeft( new Node( new Token<String>( TokenType.INT, "I" ) ) );
 		
 		// список аргументов
 		Node paramListNode = new Node( TokenType.PARAMS_LIST );
@@ -152,7 +152,7 @@ public class ParserFullTest extends TestCase {
 		// первая команда
 		Node command1Node = new Node( TokenType.COMMAND );
 		Node typeCommand1Node = new Node( TokenType.TYPE );
-		typeCommand1Node.setLeft( new Node( TokenType.INT ) );
+		typeCommand1Node.setLeft( new Node( new Token<String>( TokenType.INT, "I" ) ) );
 		command1Node.setLeft( typeCommand1Node );
 		command1Node.setRight( new Node( new Token<Object>( TokenType.NAME, "a" ) ) );
 		// вторая команда

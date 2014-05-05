@@ -1,46 +1,59 @@
 package main.ru.svichkarev.compiler.translator;
 
+import main.ru.svichkarev.compiler.parser.Node;
+
 import java.io.IOException;
 import java.io.Writer;
-
-import main.ru.svichkarev.compiler.parser.Node;
+import java.util.Iterator;
+import java.util.List;
 
 public class Translator {
 	private Node tree;
 	private Writer writer;
-	
+
+    // TODO: таблица функций
+    // TODO: таблица переменных для каждой функции
+
 	public Translator( Node inputTree, Writer writer ){
 		tree = inputTree;
 		this.writer = writer;
 	}
 	
 	// главный метод - перевода программы в байт код
-	public void translateProgram(){
-		// TODO: делаем всякие подсчёты
-		//вставим начало шаблона
-		try {
-			writer.write( 
-					".class public Expr\n" +
-					".super java/lang/Object\n" +
+	public void translateProgram() {
+        // TODO: делаем всякие подсчёты
+        //вставим начало шаблона
+        try {
+            writer.write(
+                    ".class public Expr\n" +
+                            ".super java/lang/Object\n" +
 
-					".method public <init>()V\n" +
-					"   .limit stack 1\n" +
-					"   .limit locals 1\n" +
-					"   aload_0\n" +
-					"   invokespecial java/lang/Object/<init>()V\n" +
-					"   return\n" +
-					".end method\n" +
+                            ".method public <init>()V\n" +
+                            "   .limit stack 1\n" +
+                            "   .limit locals 1\n" +
+                            "   aload_0\n" +
+                            "   invokespecial java/lang/Object/<init>()V\n" +
+                            "   return\n" +
+                            ".end method\n"/* +
 
-					".method public static main([Ljava/lang/String;)V\n" +
-					"   .limit stack 10\n" +
-					"   .limit locals 2\n"
-					);
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		
-		
+                            ".method public static main([Ljava/lang/String;)V\n" +
+                            "   .limit stack 10\n" +
+                            "   .limit locals 2\n"*/
+            );
+        } catch (IOException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+
+        List<Node> functions = tree.getChildren();
+        for (Iterator<Node> it = functions.iterator(); it.hasNext(); ) {
+            Node node = it.next();
+            translateFunction(node);
+        }
+
+        // TODO: проверка, чтобы был метод main, иначе кидать ошибку
+
+        /*
 		// выделяем нужную команду
 		Node neededCommand = null;
 		neededCommand = tree.getChildren().get(0); // function
@@ -65,13 +78,61 @@ public class Translator {
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
-		}
-				
-	}
-	
-	// транслирует только одну команду
+		}*/
+
+    }
+
+    private void translateFunction(Node functionNode) {
+        // разбираем возвращаемое значение и аргументы, выводим протатип функции
+        Node returnTypeNode = functionNode.getChildren().get(0);
+        Node parlistNode = functionNode.getChildren().get(1);
+        Node bodyNode = functionNode.getChildren().get(2);
+
+        // пишем заголовок метода
+        String descriptorFunction = ".method public static ";
+        descriptorFunction += functionNode.getValue().getTokenValue() + "(";
+
+        // разбираем аргументы
+        List<Node> params = parlistNode.getChildren();
+        for (Iterator<Node> it = params.iterator(); it.hasNext(); ) {
+            Node param = it.next();
+            // получили название типа
+            descriptorFunction += param.getChildren().get(0).getValue().getTokenValue();
+        }
+
+        descriptorFunction += ")" + returnTypeNode.getValue().getTokenValue() + "\n";
+        try {
+            writer.write( descriptorFunction );
+        } catch (IOException e) {
+            // TODO
+            e.printStackTrace();
+        }
+
+        // разбираем тело
+        List<Node> commands = bodyNode.getChildren();
+        for (Iterator<Node> iterator = commands.iterator(); iterator.hasNext(); ) {
+            Node command = iterator.next();
+            translateCommand( command );
+        }
+
+        // закрываем метод
+        try {
+            writer.write(
+                "   return\n" +
+                ".end method\n"
+            );
+        } catch (IOException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+    }
+
+    // транслирует только одну команду
 	private void translateCommand( Node commandNode ){
-		// TODO: упрощённая реализация, парсим только команду вида:
+		// определяем тип команды
+
+
+
 		// var = expr;
 		
 		// дойдём до expr

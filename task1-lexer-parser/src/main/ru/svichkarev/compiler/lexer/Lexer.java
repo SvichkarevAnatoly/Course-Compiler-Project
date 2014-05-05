@@ -251,13 +251,15 @@ public class Lexer {
 		
 		// TODO: нужно для каждого служебного слова определить возможные впритык следующие символы(они разные)
 		Token<?> result = null;
+        // TODO: символьные константы вынести
 		//определение служебное ли это слово
 		if( ident.equals( "return" ) ){
 			result = new Token<Object>( TokenType.RETURN );
 		} else if( ident.equals( "int" ) ){
-			result = new Token<Object>( TokenType.INT );
+			result = new Token<String>( TokenType.INT, "I" );
 		} else if( ident.equals( "double" ) ){
-			result = new Token<Object>( TokenType.DOUBLE );
+            // TODO: double не совсем double, а float ?
+			result = new Token<String>( TokenType.DOUBLE, "F" );
 		} else if( ident.equals( "print" ) ){
 			result = new Token<Object>( TokenType.PRINT );
 		} else{
