@@ -10,13 +10,13 @@ public class BufferTest extends TestCase {
 	private final int END_OF_SOURCE_CODE = -1;
 	private final int DEFAULT_SIZE = 10;
 
-    /*
-	@Test(expected = IllegalArgumentException.class)
-	public void testIllegalCapacity() {
+    /*@Test(expected = IllegalArgumentException.class)
+	public void testIllegalCapacity(){
 		Buffer buffer = new Buffer( new StringReader("AA"), 0 );
 		buffer.getChar();
-	}
+	}*/
 
+    /*
 	@Test(expected = IllegalArgumentException.class)
 	public void testIllegalCapacity2() {
 		Buffer buffer = new Buffer( new StringReader("AA"), 1 );

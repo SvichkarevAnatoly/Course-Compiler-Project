@@ -1,11 +1,14 @@
 package main.ru.svichkarev.compiler.translator;
 
+import main.ru.svichkarev.compiler.lexer.TokenType;
 import main.ru.svichkarev.compiler.parser.Node;
 
 import java.io.IOException;
 import java.io.Writer;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 
 public class Translator {
 	private Node tree;
@@ -21,6 +24,9 @@ public class Translator {
 	
 	// главный метод - перевода программы в байт код
 	public void translateProgram() {
+        // создаём таблицу функций
+        Map<String, FunctionTableInfo> functionTable = new HashMap<String, FunctionTableInfo>();
+
         // TODO: делаем всякие подсчёты
         //вставим начало шаблона
         try {
@@ -83,8 +89,11 @@ public class Translator {
     }
 
     private void translateFunction(Node functionNode) {
+        // создаём таблицу переменных
+        Map<String, VariableTableInfo> variableTable = new HashMap<String, VariableTableInfo>();
+
         // разбираем возвращаемое значение и аргументы, выводим протатип функции
-        Node returnTypeNode = functionNode.getChildren().get(0);
+        Node returnTypeNode = functionNode.getChildren().get(0).getChildren().get(0);
         Node parlistNode = functionNode.getChildren().get(1);
         Node bodyNode = functionNode.getChildren().get(2);
 
@@ -94,10 +103,13 @@ public class Translator {
 
         // разбираем аргументы
         List<Node> params = parlistNode.getChildren();
-        for (Iterator<Node> it = params.iterator(); it.hasNext(); ) {
-            Node param = it.next();
-            // получили название типа
-            descriptorFunction += param.getChildren().get(0).getValue().getTokenValue();
+        if( ! params.get(0).match( TokenType.EMPTY ) ) {
+            for (Iterator<Node> it = params.iterator(); it.hasNext(); ) {
+                Node param = it.next();
+                // получили название типа
+                // TODO: нужно ставить запятую ещё
+                descriptorFunction += param.getChildren().get(0).getChildren().get(0).getValue().getTokenValue();
+            }
         }
 
         descriptorFunction += ")" + returnTypeNode.getValue().getTokenValue() + "\n";
@@ -129,12 +141,23 @@ public class Translator {
 
     // транслирует только одну команду
 	private void translateCommand( Node commandNode ){
-		// определяем тип команды
+        List<Node> operands = commandNode.getChildren();
+		// определяем тип команды:
+        // Если return ...;
+        switch ( operands.get(0).getValue().getTokenType() ){
+            case TYPE:
+                break;
+            case NAME:
+                break;
+            case RETURN:
+                break;
+            case PRINT:
+                break;
+        }
 
 
 
-		// var = expr;
-		
+		// Если var = expr;
 		// дойдём до expr
 		Node exprNode = commandNode.getChildren().get(2);
 		
