@@ -24,7 +24,7 @@ public enum TokenType {
 	ARG_LIST,
 	
 	TYPE,
-	INT, DOUBLE,
+	INT, DOUBLE, VOID, // TODO: добавить в лексер и раньше обработку VOID
 	
 	ASSIGNMENT, // присваивание
 	

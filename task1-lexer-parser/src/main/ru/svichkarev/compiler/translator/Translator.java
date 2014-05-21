@@ -2,6 +2,7 @@ package main.ru.svichkarev.compiler.translator;
 
 import main.ru.svichkarev.compiler.lexer.TokenType;
 import main.ru.svichkarev.compiler.parser.Node;
+import main.ru.svichkarev.compiler.translator.table.FunctionInfo;
 import main.ru.svichkarev.compiler.translator.table.TableFunctions;
 import main.ru.svichkarev.compiler.translator.table.TableVariables;
 import main.ru.svichkarev.compiler.translator.table.VariableInfo;
@@ -102,6 +103,7 @@ public class Translator {
         String descriptorFunction = ".method public static ";
         descriptorFunction += functionNode.getValue().getTokenValue() + "(";
 
+        // TODO: каждый аргумент - локальная переменная, добавить в таблицу переменных
         // разбираем аргументы
         List<Node> params = parlistNode.getChildren();
         if( ! params.get(0).match( TokenType.EMPTY ) ) {
@@ -154,15 +156,23 @@ public class Translator {
             case TYPE:
                 // добавляем запись в таблицу переменных
                 VariableInfo var = new VariableInfo( VariableInfo.VariableType.convertFromTokenType( operand.getFirstChildren().getTokenType() ),
-                        tv.getLastLocalsNumber() );
+                        tv.getLastLocalsIndex() );
 
                 tv.add( (String)operands.get(1).getTokenValue(), var );
 
                 break;
             // var = expr;
             case NAME:
-                // TODO: проверить, что переменная объявлена
-                // TODO: если объявлена, то в конце проставить инициализацию
+                // проверка, что переменная объявлена
+                // если объявлена, то в конце проставить инициализацию
+                String varName = (String) operand.getTokenValue();
+                if( ! tv.isDeclared(varName) ){
+                    // должна быть объявлена
+                    throw new RuntimeException("Variable must be declared");
+                } else{
+                    tv.setInitialization( varName );
+                }
+
                 // дойдём до expr
                 Node exprNode = commandNode.getChildren().get(2);
 
@@ -174,10 +184,65 @@ public class Translator {
                     e.printStackTrace();
                 }
 
+                // выполнить присвоение( снять со стека значение и положить в переменную )
+                int index = tv.getLocalIndex(varName);
+                try {
+                    // TODO: здесь не должно этого быть, это синтаксис
+                    if( index < 4 ){
+                        writer.write( "   istore_" + index + "\n" );
+                    } else {
+                        writer.write("   istore " + index + "\n");
+                    }
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+
                 break;
             case RETURN:
+                // проверка, какой тип должна вернуть функция( из таблицы функций )
+                FunctionInfo.FunctionReturnType retType = tf.getCurrentFunctionReturnType();
+
+                switch ( retType ){
+                    case VOID:
+                        // просто пишем возврат из функции
+                        try {
+                            writer.write( "   return\n" );
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                        }
+                        break;
+                    case DOUBLE:
+                        VariableInfo.VariableType exprType;
+                        // транслируем дальнейшее выражение
+                        exprNode = commandNode.getChildren().get(1);
+
+                        // запускаем разбор поддерева выражения
+                        try {
+                            exprType = translateExpr( exprNode );
+                        } catch (IOException e) {
+                            // TODO Auto-generated catch block
+                            e.printStackTrace();
+                        }
+                    case INT:
+                        if( exprType == VariableInfo.VariableType.DOUBLE ){
+                            try {
+                                writer.write( "   dreturn\n" );
+                            } catch (IOException e) {
+                                e.printStackTrace();
+                            }
+                        } else {
+                            try {
+                                writer.write( "   ireturn\n" );
+                            } catch (IOException e) {
+                                e.printStackTrace();
+                            }
+                        }
+
+                        break;
+                }
+
                 break;
-            case PRINT:
+            case PRINT: // TODO: вспомнить как реализовывал
                 break;
             // последняя пустая команда, просто пропускаем
             case EMPTY:
@@ -191,44 +256,68 @@ public class Translator {
 	// TODO: простая реализация, без вызова методов
 	//(и пока без возведения в степень, потому что нужно нужно функцию вызывать)
 	// разбираем поддерево выражения
-	private void translateExpr( Node exprNode ) throws IOException{
+	private VariableInfo.VariableType translateExpr( Node exprNode ) throws IOException{
+        // как минимум будет INT, но возможно расширение
+        VariableInfo.VariableType exprType = VariableInfo.VariableType.INT;
+
 		// рекурсивная функция, работающая со стеком
 		switch ( exprNode.getValue().getTokenType() ) {
 		case PLUS:
 			// рекурсивно вызываем для левого и правого поддерева
-			translateExpr(exprNode.getChildren().get(0));
-			translateExpr(exprNode.getChildren().get(1));
+			exprType = translateExpr(exprNode.getChildren().get(0));
+            if( exprType == VariableInfo.VariableType.INT ){
+                exprType = translateExpr(exprNode.getChildren().get(1));
+            } else {
+                translateExpr(exprNode.getChildren().get(1));
+            }
+
+            // TODO: команда для нужного типа
+            // TODO: сделать обёртку для строкового представления команд
 			writer.write( "   iadd\n" );
-			break;
+
+            return exprType;
 		case MINUS:
 			// если унарный
 			if( exprNode.getChildren().size() == 1 ){
-				translateExpr(exprNode.getChildren().get(0));
+				exprType = translateExpr(exprNode.getChildren().get(0));
 				writer.write( "   ineg\n" );
+                return exprType;
 			} else{
-				translateExpr(exprNode.getChildren().get(0));
-				translateExpr(exprNode.getChildren().get(1));
+				exprType = translateExpr(exprNode.getChildren().get(0));
+				if( exprType == VariableInfo.VariableType.INT ){
+                    exprType = translateExpr(exprNode.getChildren().get(1));
+                } else {
+                    translateExpr(exprNode.getChildren().get(1));
+                }
 				writer.write( "   isub\n" );
+                return exprType;
 			}
-			break;
 		case MULTIPLICATION:
-			translateExpr(exprNode.getChildren().get(0));
-			translateExpr(exprNode.getChildren().get(1));
+			exprType = translateExpr(exprNode.getChildren().get(0));
+            if( exprType == VariableInfo.VariableType.INT ) {
+                exprType = translateExpr(exprNode.getChildren().get(1));
+            } else {
+                translateExpr(exprNode.getChildren().get(1));
+            }
 			writer.write( "   imul\n" );
-			break;
+			return exprType;
 		case DIVISION:
-			translateExpr(exprNode.getChildren().get(0));
-			translateExpr(exprNode.getChildren().get(1));
+			exprType = translateExpr(exprNode.getChildren().get(0));
+            if( exprType == VariableInfo.VariableType.INT ) {
+                exprType = translateExpr(exprNode.getChildren().get(1));
+            } else {
+                translateExpr(exprNode.getChildren().get(1));
+            }
 			writer.write( "   idiv\n" );
-			break;
+			return exprType;
+        // TODO: нужно конкретно определить тип
 		case NUMBER:
 			//range -32768 to 32767
 			writer.write( "   sipush " + exprNode.getValue().getTokenValue().toString() + "\n" );
-			break;
-			
+			// TODO: исправить
+			return exprType;
 		default:
-			// TODO: кидаем ошибку
-			break;
+			throw new RuntimeException("TR: Невозможно распарсить выражение");
 		}
 	}
 }

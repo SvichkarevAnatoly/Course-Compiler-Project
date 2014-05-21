@@ -17,19 +17,34 @@ public class TableVariables {
     // TODO: сделать удобные методы
 
     // TODO: проверить с какого номера идёт индексация
-    public int getLastLocalsNumber(){
+    public int getLastLocalsIndex(){
         return variables.size();
     }
 
     // добавление в таблицу новой переменной
-    public void add( String name, VariableInfo varInfo) {
+    public void add( String variableName, VariableInfo varInfo) {
         // проверить на повторное объявление переменной
-        if( ! variables.containsKey( name ) ) {
-            variables.put(name, varInfo);
+        if( ! variables.containsKey( variableName ) ) {
+            variables.put(variableName, varInfo);
         } else {
             // уже объявлена эта переменная
             throw new RuntimeException("Variable has already declared");
         }
+    }
+
+    // проверка, объявлена ли переменная
+    public boolean isDeclared( String variableName ) {
+        return variables.containsKey(variableName);
+    }
+
+    // установить флаг инициализации
+    public void setInitialization( String variableName ){
+        variables.get( variableName ).setInitialization();
+    }
+
+    // получить номер локальной переменной
+    public int getLocalIndex( String variableName ){
+        return variables.get( variableName ).getLocalsIndex();
     }
 }
 

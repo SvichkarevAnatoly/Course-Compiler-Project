@@ -1,19 +1,31 @@
 package main.ru.svichkarev.compiler.translator.table;
 
+import main.ru.svichkarev.compiler.lexer.TokenType;
+
 public class FunctionInfo {
     // для возвращаемого типа
-    private enum FunctionReturnType{
-        INT, DOUBLE, VOID
-    }
+    public enum FunctionReturnType{
+        INT, DOUBLE, VOID;
 
-    // для типа параметра
-    private enum FunctionParameterType{
-        INT, DOUBLE
+        public static FunctionReturnType convertFromTokenType(TokenType tokenType){
+            switch (tokenType){
+                case INT:
+                    return INT;
+                case DOUBLE:
+                    return DOUBLE;
+                case VOID:
+                    return VOID;
+                default:
+                    throw new RuntimeException( "TR: Недопустимый тип" );
+            }
+        }
     }
 
     private FunctionReturnType returnType;
     // TODO: или лучше вектор?
-    private FunctionParameterType [] parameterTypes;
+    private VariableInfo.VariableType [] parameterTypes;
 
-    // TODO: удобные методы
+    public FunctionReturnType getReturnType() {
+        return returnType;
+    }
 }

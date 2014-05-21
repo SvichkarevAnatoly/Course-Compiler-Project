@@ -6,10 +6,11 @@ import main.ru.svichkarev.compiler.lexer.Lexer;
 import main.ru.svichkarev.compiler.parser.Node;
 import main.ru.svichkarev.compiler.parser.Parser;
 import main.ru.svichkarev.compiler.translator.Translator;
-import org.junit.Ignore;
 import org.junit.Test;
 
-import java.io.*;
+import java.io.StringReader;
+import java.io.StringWriter;
+import java.io.Writer;
 
 public class TranslatorFunctionsTest extends TestCase {
 	// пример простой программы
@@ -48,7 +49,7 @@ public class TranslatorFunctionsTest extends TestCase {
 			"   return\n" +
 			".end method\n";
 
-    @Ignore("Not Ready to Run")
+    /*@Ignore("Not Ready to Run")
 	@Test
 	public void testReturnNumberFunctionProgram() {
         String inputStr = etalonStr;
@@ -67,16 +68,39 @@ public class TranslatorFunctionsTest extends TestCase {
 		String outputStr = writer.toString();
 
 		assertEquals( outputEtalonStr, outputStr );
-	}
+	}*/
 
+    /*@Ignore("Not Ready to Run")
     @Test
     public void testManyVariablesFunction() {
-        // пример простой программы
         final String inputSource =
                 "int main(){" +
                 "	int a;" +
                 "	int b;" +
                 "	int c;" +
+                "}";
+
+        Buffer buffer = new Buffer( new StringReader( inputSource ) );
+        Lexer lexer = new Lexer( buffer );
+        Parser parser = new Parser( lexer );
+
+        Node realTree = parser.parseProgram();
+
+        Writer writer = new StringWriter();
+        Translator translator = new Translator( realTree, writer );
+
+        translator.translateProgram();
+        String outputStr = writer.toString();
+
+        //assertEquals( outputEtalonStr, outputStr );
+    }*/
+
+    @Test
+    public void testInitializationVariableFunction() {
+        final String inputSource =
+                "int main(){" +
+                "	int a;" +
+                "   a = 7;" +
                 "}";
 
         Buffer buffer = new Buffer( new StringReader( inputSource ) );

@@ -31,4 +31,14 @@ public class VariableInfo{
         this.type = type;
         localsIndex = index;
     }
+
+    // получить номер переменной
+    public int getLocalsIndex(){
+        return localsIndex;
+    }
+
+    // установить флаг инициализации
+    public void setInitialization(){
+        initialization = true;
+    }
 }

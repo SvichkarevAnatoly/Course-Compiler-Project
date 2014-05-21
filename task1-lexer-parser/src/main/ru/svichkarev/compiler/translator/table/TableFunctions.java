@@ -6,5 +6,15 @@ import java.util.Map;
 public class TableFunctions {
     private Map<String, FunctionInfo> functions = new HashMap<String, FunctionInfo>();
 
-    // TODO: сделать удобные методы
+    private FunctionInfo currentFunction;
+
+    // получить возвращаемый тип для текущей функции
+    public FunctionInfo.FunctionReturnType getCurrentFunctionReturnType() {
+        return currentFunction.getReturnType();
+    }
+
+    // добавляет функцию в таблицу
+    public void addCurrentFunction( String functionName ) {
+        functions.put(functionName, currentFunction);
+    }
 }
