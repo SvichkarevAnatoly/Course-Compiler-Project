@@ -13,7 +13,17 @@ public class Node {
 	public Token<?> getValue() {
 		return value;
 	}
-	
+
+    // более удобный метод
+    public TokenType getTokenType() {
+        return value.getTokenType();
+    }
+
+    // более удобный метод
+    public Object getTokenValue() {
+        return value.getTokenValue();
+    }
+
 	public Node( Token<?> newValue ) {
 		value = newValue;
 		listChild = new ArrayList< Node >();
@@ -39,7 +49,17 @@ public class Node {
 	public List<Node> getChildren(){
 		return listChild;
 	}
-	
+
+    // более удобный метод, в случае, если есть только один потомок
+    public Node getFirstChildren(){
+        if( listChild.size() == 1 ){
+            return listChild.get(0);
+        } else{
+            // TODO:
+            throw new RuntimeException( "Node have more than one children" );
+        }
+    }
+
 	// метод сверки типов
 	public boolean match( TokenType type ){
 		return value.match( type );

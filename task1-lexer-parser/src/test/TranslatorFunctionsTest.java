@@ -6,6 +6,7 @@ import main.ru.svichkarev.compiler.lexer.Lexer;
 import main.ru.svichkarev.compiler.parser.Node;
 import main.ru.svichkarev.compiler.parser.Parser;
 import main.ru.svichkarev.compiler.translator.Translator;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import java.io.*;
@@ -46,9 +47,10 @@ public class TranslatorFunctionsTest extends TestCase {
 			"   invokevirtual java/io/PrintStream/println(I)V\n" +
 			"   return\n" +
 			".end method\n";
-	
+
+    @Ignore("Not Ready to Run")
 	@Test
-	public void testNumberProgram() {
+	public void testReturnNumberFunctionProgram() {
         String inputStr = etalonStr;
         String outputEtalonStr = outputEtalonBeginStr + outputEtalonEndStr;
 		
@@ -66,4 +68,29 @@ public class TranslatorFunctionsTest extends TestCase {
 
 		assertEquals( outputEtalonStr, outputStr );
 	}
+
+    @Test
+    public void testManyVariablesFunction() {
+        // пример простой программы
+        final String inputSource =
+                "int main(){" +
+                "	int a;" +
+                "	int b;" +
+                "	int c;" +
+                "}";
+
+        Buffer buffer = new Buffer( new StringReader( inputSource ) );
+        Lexer lexer = new Lexer( buffer );
+        Parser parser = new Parser( lexer );
+
+        Node realTree = parser.parseProgram();
+
+        Writer writer = new StringWriter();
+        Translator translator = new Translator( realTree, writer );
+
+        translator.translateProgram();
+        String outputStr = writer.toString();
+
+        //assertEquals( outputEtalonStr, outputStr );
+    }
 }

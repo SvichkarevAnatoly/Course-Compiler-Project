@@ -2,13 +2,14 @@ package main.ru.svichkarev.compiler.translator;
 
 import main.ru.svichkarev.compiler.lexer.TokenType;
 import main.ru.svichkarev.compiler.parser.Node;
+import main.ru.svichkarev.compiler.translator.table.TableFunctions;
+import main.ru.svichkarev.compiler.translator.table.TableVariables;
+import main.ru.svichkarev.compiler.translator.table.VariableInfo;
 
 import java.io.IOException;
 import java.io.Writer;
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
 
 public class Translator {
 	private Node tree;
@@ -25,7 +26,7 @@ public class Translator {
 	// главный метод - перевода программы в байт код
 	public void translateProgram() {
         // создаём таблицу функций
-        Map<String, FunctionTableInfo> functionTable = new HashMap<String, FunctionTableInfo>();
+        TableFunctions tf = new TableFunctions();
 
         // TODO: делаем всякие подсчёты
         //вставим начало шаблона
@@ -53,8 +54,8 @@ public class Translator {
 
         List<Node> functions = tree.getChildren();
         for (Iterator<Node> it = functions.iterator(); it.hasNext(); ) {
-            Node node = it.next();
-            translateFunction(node);
+            Node function = it.next();
+            translateFunction( function, tf );
         }
 
         // TODO: проверка, чтобы был метод main, иначе кидать ошибку
@@ -88,9 +89,9 @@ public class Translator {
 
     }
 
-    private void translateFunction(Node functionNode) {
+    private void translateFunction(Node functionNode, TableFunctions tf) {
         // создаём таблицу переменных
-        Map<String, VariableTableInfo> variableTable = new HashMap<String, VariableTableInfo>();
+        TableVariables tv = new TableVariables();
 
         // разбираем возвращаемое значение и аргументы, выводим протатип функции
         Node returnTypeNode = functionNode.getChildren().get(0).getChildren().get(0);
@@ -124,7 +125,7 @@ public class Translator {
         List<Node> commands = bodyNode.getChildren();
         for (Iterator<Node> iterator = commands.iterator(); iterator.hasNext(); ) {
             Node command = iterator.next();
-            translateCommand( command );
+            translateCommand( command, tv, tf );
         }
 
         // закрываем метод
@@ -137,37 +138,54 @@ public class Translator {
             // TODO Auto-generated catch block
             e.printStackTrace();
         }
+
+        // TODO: после успешной трансляции функции, добавляем его в таблицу функций
     }
 
-    // транслирует только одну команду
-	private void translateCommand( Node commandNode ){
+    // транслирует команду
+	private void translateCommand(Node commandNode, TableVariables tv, TableFunctions tf){
         List<Node> operands = commandNode.getChildren();
+
 		// определяем тип команды:
-        // Если return ...;
-        switch ( operands.get(0).getValue().getTokenType() ){
+        // TODO: добавить ещё if и while
+        Node operand = operands.get(0);
+        switch( operand.getTokenType() ){
+            // объявление переменной
             case TYPE:
+                // добавляем запись в таблицу переменных
+                VariableInfo var = new VariableInfo( VariableInfo.VariableType.convertFromTokenType( operand.getFirstChildren().getTokenType() ),
+                        tv.getLastLocalsNumber() );
+
+                tv.add( (String)operands.get(1).getTokenValue(), var );
+
                 break;
+            // var = expr;
             case NAME:
+                // TODO: проверить, что переменная объявлена
+                // TODO: если объявлена, то в конце проставить инициализацию
+                // дойдём до expr
+                Node exprNode = commandNode.getChildren().get(2);
+
+                // запускаем разбор поддерева выражения
+                try {
+                    translateExpr( exprNode );
+                } catch (IOException e) {
+                    // TODO Auto-generated catch block
+                    e.printStackTrace();
+                }
+
                 break;
             case RETURN:
                 break;
             case PRINT:
                 break;
+            // последняя пустая команда, просто пропускаем
+            case EMPTY:
+                break;
+            default:
+                // недопустимый тип команды
+                throw new RuntimeException("Invalid type of command");
         }
-
-
-
-		// Если var = expr;
-		// дойдём до expr
-		Node exprNode = commandNode.getChildren().get(2);
-		
-		// запускаем разбор поддерева выражения
-		try {
-			translateExpr( exprNode );
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
 	}
 	
 	// TODO: простая реализация, без вызова методов
