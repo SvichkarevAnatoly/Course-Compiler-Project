@@ -49,28 +49,33 @@ public class Parser {
 		Token<?> nameToken = lexer.getToken();
 		if( ! nameToken.match( TokenType.NAME ) ){
 			// TODO: кинуть ошибку
+            throw new RuntimeException("проверить");
 		}
 		
 		// аргументы
 		Token<?> openBracketToken = lexer.getToken();
 		if( ! openBracketToken.match( TokenType.BRACKET_OPEN ) ){
 			// TODO: кинуть ошибку
+            throw new RuntimeException("проверить");
 		}
 		Node parlistNode = parseParlist();
 		Token<?> closeBracketToken = lexer.getToken();
 		if( ! closeBracketToken.match( TokenType.BRACKET_CLOSE ) ){
 			// TODO: кинуть ошибку
+            throw new RuntimeException("проверить");
 		}
 		
 		// тело
 		Token<?> openBraceToken = lexer.getToken();
 		if( ! openBraceToken.match( TokenType.BRACE_OPEN ) ){
 			// TODO: кинуть ошибку
+            throw new RuntimeException("проверить");
 		}
 		Node bodyNode = parseBody();
 		Token<?> closeBraceToken = lexer.getToken();
 		if( ! closeBraceToken.match( TokenType.BRACE_CLOSE ) ){
 			// TODO: кинуть ошибку
+            throw new RuntimeException("проверить");
 		}
 		
 		// если дошли до сюда, то смогли распарсить
@@ -108,6 +113,7 @@ public class Parser {
 			Token<?> nameToken = lexer.getToken();
 			if( ! nameToken.match( TokenType.NAME ) ){
 				// TODO: кинуть ошибку
+                throw new RuntimeException("проверить");
 			}
 			// выделили один параметр, добавляем в список
 			Node newParam = new Node( new Token<String>( TokenType.PARAM, (String) nameToken.getTokenValue() ) );
@@ -119,7 +125,8 @@ public class Parser {
 		
 		// проверка корректно ли завершилось
 		if( ! (commaToken.match( TokenType.COMMA ) || commaToken.match( TokenType.BRACKET_CLOSE )) ){
-			// TODO: кинуть ошибку 
+			// TODO: кинуть ошибку
+            throw new RuntimeException("проверить");
 		}
 		
 		return result;
@@ -143,6 +150,7 @@ public class Parser {
 			Token<?> semicolonToken = lexer.getToken();
 			if( ! semicolonToken.match( TokenType.SEMICOLON ) ){
 				// TODO кинуть ошибку
+                throw new RuntimeException("проверить");
 			}
 			command = parseCommand();
 			result.setRight( command );
@@ -171,6 +179,7 @@ public class Parser {
 				result.setRight( new Node( nameToken ) );
 			}else{
 				// TODO: кинуть ошибку
+                throw new RuntimeException("проверить");
 			}
 			
 			break;
@@ -183,6 +192,7 @@ public class Parser {
 				result.setRight( parseExpr() );
 			}else{
 				// TODO: кинуть ошибку
+                throw new RuntimeException("проверить");
 			}
 			
 			break;
@@ -196,14 +206,17 @@ public class Parser {
 			Token<?> openBracketToken = lexer.getToken();
 			if( ! openBracketToken.match( TokenType.BRACKET_OPEN ) ){
 				// TODO: кинуть ошибку
+                throw new RuntimeException("проверить");
 			}
 			Token<?> nameVariable = lexer.getToken();
 			if( ! nameVariable.match( TokenType.NAME ) ){
 				// TODO: кинуть ошибку
+                throw new RuntimeException("проверить");
 			}
 			Token<?> closeBracketToken = lexer.getToken();
 			if( ! closeBracketToken.match( TokenType.BRACKET_CLOSE ) ){
 				// TODO: кинуть ошибку
+                throw new RuntimeException("проверить");
 			}
 			result.setLeft( new Node( whatEver ) );
 			result.setRight( new Node( nameVariable ) );
@@ -211,7 +224,7 @@ public class Parser {
 			break;
 		default:
 			// TODO кинуть исключение
-			break;
+            throw new RuntimeException("проверить");
 		}
 		
 		return result;
@@ -239,6 +252,7 @@ public class Parser {
 		
 		if( ! commaToken.match( TokenType.BRACKET_CLOSE ) ){
 			// TODO: кинуть ошибку
+            throw new RuntimeException("проверить");
 		}
 		
 		return result;
@@ -249,13 +263,15 @@ public class Parser {
 		
 		Token<?> typeToken = lexer.getToken();
 		if( typeToken.match( TokenType.INT ) ||
-		    typeToken.match( TokenType.DOUBLE )){
+		    typeToken.match( TokenType.DOUBLE ) ||
+            typeToken.match( TokenType.VOID )){
 			
 			Node specificType = new Node( typeToken );
 			result = new Node( TokenType.TYPE );
 			result.setLeft( specificType );
 		}else{
 			// TODO: кинуть ошибку
+            throw new RuntimeException("проверить");
 		}
 		
 		return result;
@@ -355,8 +371,8 @@ public class Parser {
 				return result;
 			}else{
 				// TODO: кинуть ошибку
+                throw new RuntimeException("проверить");
 			}
-			break;
 		case NUMBER:
 			result = new Node( token );
 			break;
@@ -372,6 +388,7 @@ public class Parser {
 				nextToken = lexer.getToken();
 				if( ! nextToken.match( TokenType.BRACKET_CLOSE ) ){
 					// TODO: кинуть ошибку
+                    throw new RuntimeException("проверить");
 				}
 			} else{
 				result = new Node( token );
@@ -380,6 +397,7 @@ public class Parser {
 			break;
 		default:
 			// TODO: кинуть ошибку
+            throw new RuntimeException("проверить");
 		}
 		
 		return result;

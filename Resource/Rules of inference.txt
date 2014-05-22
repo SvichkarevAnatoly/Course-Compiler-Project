@@ -7,7 +7,7 @@ parlist -> type name | type name , params | E
 params -> type name , params | type name
 
 body -> command ; body | E
-command -> type name | name = expr | return expr | return | print ( name )
+command -> type name | name = expr | return expr | print ( name )
 
 expr -> term [+-] term [+-] ... [+-] term // неформально определены
 term -> factor [*/] factor [*/] ... [*/] factor // неформально определены

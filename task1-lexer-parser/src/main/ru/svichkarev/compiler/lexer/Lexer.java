@@ -258,11 +258,12 @@ public class Lexer {
 		} else if( ident.equals( "int" ) ){
 			result = new Token<String>( TokenType.INT, "I" );
 		} else if( ident.equals( "double" ) ){
-            // TODO: double не совсем double, а float ?
-			result = new Token<String>( TokenType.DOUBLE, "F" );
+			result = new Token<String>( TokenType.DOUBLE, "D" );
 		} else if( ident.equals( "print" ) ){
 			result = new Token<Object>( TokenType.PRINT );
-		} else{
+		} else if( ident.equals( "void" ) ) {
+            result = new Token<Object>( TokenType.VOID );
+        } else{
 			result = new Token<String>( TokenType.NAME, ident );
 		}
 		

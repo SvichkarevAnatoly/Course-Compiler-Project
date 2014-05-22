@@ -5,6 +5,8 @@ import java.util.Map;
 
 public class TableVariables {
     private Map<String, VariableInfo> variables = new HashMap<String, VariableInfo>();
+    // хранит последнее смещение для переменной
+    private int lastLocalsShift = 0;
 
     // нужен обычный конструктор, если есть конструктор копирования
     public TableVariables(){}
@@ -14,21 +16,17 @@ public class TableVariables {
         // TODO: полное копирование реализовать
     }
 
-    // TODO: сделать удобные методы
-
-    // TODO: проверить с какого номера идёт индексация
-    public int getLastLocalsIndex(){
-        return variables.size();
-    }
-
     // добавление в таблицу новой переменной
     public void add( String variableName, VariableInfo varInfo) {
         // проверить на повторное объявление переменной
         if( ! variables.containsKey( variableName ) ) {
+            varInfo.setLocalsIndex( lastLocalsShift );
+            // инкрементируем смещение для будущей новой переменной
+            lastLocalsShift += varInfo.getType() == VariableInfo.VariableType.INT ? 1 : 2;
             variables.put(variableName, varInfo);
         } else {
             // уже объявлена эта переменная
-            throw new RuntimeException("Variable has already declared");
+            throw new RuntimeException("TR: Повторное объявление переменной");
         }
     }
 
@@ -45,6 +43,20 @@ public class TableVariables {
     // получить номер локальной переменной
     public int getLocalIndex( String variableName ){
         return variables.get( variableName ).getLocalsIndex();
+    }
+
+    // получить тип указанной переменной
+    public VariableInfo.VariableType getType( String variableName ){
+        if( variables.containsKey( variableName ) ){
+            return variables.get( variableName ).getType();
+        } else {
+            throw new RuntimeException("TR: не удалось определить тип переменной");
+        }
+    }
+
+    // получить размер под локальные переменные
+    public int getLocalSpace() {
+        return lastLocalsShift;
     }
 }
 

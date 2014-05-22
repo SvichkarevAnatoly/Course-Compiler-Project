@@ -23,18 +23,29 @@ public class VariableInfo{
 
     private boolean initialization = false;
 
-    // номер переменной на стеке
+    // смещение относительно начала области переменных
+    //(для double смещение на 2)
     private int localsIndex;
 
-    public VariableInfo( VariableType type, int index ) {
+    public VariableInfo( TokenType type ) {
         initialization = false;
-        this.type = type;
-        localsIndex = index;
+        this.type = VariableType.convertFromTokenType( type );
+        localsIndex = -1; // TODO: так ли надо
+    }
+
+    // получить тип переменной
+    public VariableType getType() {
+        return type;
     }
 
     // получить номер переменной
     public int getLocalsIndex(){
         return localsIndex;
+    }
+
+    // установить индекс(не в конструкторе, т.к. заранее не известен номер)
+    public void setLocalsIndex(int localsIndex) {
+        this.localsIndex = localsIndex;
     }
 
     // установить флаг инициализации

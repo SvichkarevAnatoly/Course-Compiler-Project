@@ -45,18 +45,26 @@ public class Node {
 		listChild.add( rightChild );
 	}
 
-	// TODO: нужно более высокоуровневый метод предоставить(поиск допустим), а не такой
-	public List<Node> getChildren(){
+	public List<Node> getChildrens(){
 		return listChild;
 	}
 
     // более удобный метод, в случае, если есть только один потомок
     public Node getFirstChildren(){
-        if( listChild.size() == 1 ){
+        if( listChild.size() > 0 ){
             return listChild.get(0);
         } else{
             // TODO:
             throw new RuntimeException( "Node have more than one children" );
+        }
+    }
+
+    // более удобный метод, в случае, если есть только один потомок
+    public Node getChildren( int index ){
+        if( index < listChild.size() ){
+            return listChild.get(index);
+        } else{
+            throw new RuntimeException( "NODE: Узел не имеет данного потомка" );
         }
     }
 

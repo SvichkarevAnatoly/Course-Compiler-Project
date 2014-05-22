@@ -6,3 +6,5 @@
 
 */.idea
 */*.iml
+
+task1-lexer-parser/*

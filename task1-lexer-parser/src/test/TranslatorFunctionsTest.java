@@ -96,6 +96,33 @@ public class TranslatorFunctionsTest extends TestCase {
     }*/
 
     @Test
+    public void testParlistVariablesAddTableFunction() {
+        final String inputSource =
+                "int foo(int ar, double be, int as){" +
+                "   return 45;" +
+                "}" +
+                "void main(){" +
+                "	int a;" +
+                "   a = 7;" +
+                "}";
+
+        Buffer buffer = new Buffer( new StringReader( inputSource ) );
+        Lexer lexer = new Lexer( buffer );
+        Parser parser = new Parser( lexer );
+
+        Node realTree = parser.parseProgram();
+
+        Writer writer = new StringWriter();
+        Translator translator = new Translator( realTree, writer );
+
+        translator.translateProgram();
+        String outputStr = writer.toString();
+
+        //assertEquals( outputEtalonStr, outputStr );
+    }
+
+    /*@Ignore()
+    @Test
     public void testInitializationVariableFunction() {
         final String inputSource =
                 "int main(){" +
@@ -116,5 +143,5 @@ public class TranslatorFunctionsTest extends TestCase {
         String outputStr = writer.toString();
 
         //assertEquals( outputEtalonStr, outputStr );
-    }
+    }*/
 }
