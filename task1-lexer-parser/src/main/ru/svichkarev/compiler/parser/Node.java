@@ -68,6 +68,11 @@ public class Node {
         }
     }
 
+    // возвращает число потомков
+    public int getChildrenCount(){
+        return listChild.size();
+    }
+
 	// метод сверки типов
 	public boolean match( TokenType type ){
 		return value.match( type );

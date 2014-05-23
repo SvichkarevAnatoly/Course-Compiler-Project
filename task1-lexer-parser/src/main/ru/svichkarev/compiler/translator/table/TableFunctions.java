@@ -26,4 +26,22 @@ public class TableFunctions {
             return false;
         }
     }
+
+    // получает возвращаемый тип указанной функции
+    public FunctionInfo.FunctionReturnType getReturnType( String functionName ){
+        if( ! functions.containsKey( functionName ) ){
+            throw new RuntimeException("TR: не объявлена функция");
+        }
+
+        return functions.get( functionName ).getReturnType();
+    }
+
+    // получает число аргументов
+    public int getAmountParameters(String functionName){
+        if( ! functions.containsKey( functionName ) ){
+            throw new RuntimeException("TR: не объявлена функция");
+        }
+
+        return functions.get( functionName ).getAmountParameters();
+    }
 }

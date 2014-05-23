@@ -23,6 +23,17 @@ public class FunctionInfo {
             }
         }
 
+        public VariableInfo.VariableType convertToVariableType(){
+            switch (this){
+                case INT:
+                    return VariableInfo.VariableType.INT;
+                case DOUBLE:
+                    return VariableInfo.VariableType.DOUBLE;
+                default:
+                    throw new RuntimeException( "TR: Недопустимый тип" );
+            }
+        }
+
         public String toString(){
             switch (this){
                 case VOID:

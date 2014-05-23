@@ -391,12 +391,28 @@ public class Translator {
 		case NUMBER:
 			//range -32768 to 32767
 			tmpWriter.write( "   sipush " + exprNode.getValue().getTokenValue().toString() + "\n" );
-			// TODO: исправить
+			// TODO: исправить определение типа
 			return exprType;
         case NAME:
             String varName = (String) exprNode.getTokenValue();
             tmpWriter.write( tv.getStrLoad( varName ) );
             return tv.getType( varName );
+        case CALL_FUNCTION:
+            String funcName = (String) exprNode.getChildren(0).getTokenValue();
+
+            // проверка, возвращает ли функция значение
+            if( tf.getReturnType( funcName ) == FunctionInfo.FunctionReturnType.VOID ){
+                throw new RuntimeException("TR: в выражении не может участвовать функция, возвращающая void");
+            } else{
+                // сверка фактических и формальных аргументов
+                // TODO: доработать сверку
+                if( !( tf.getAmountParameters( funcName ) == 0 &&
+                        exprNode.getChildrens().get(1).getChildrenCount() == 1) ){ // TODO: всегда ли есть EMPTY?
+                    throw new RuntimeException("TR: при вызове " + funcName + " несоответствие фактических и формальных аргументов" );
+                }
+            }
+
+            return tf.getReturnType( funcName ).convertToVariableType();
 		default:
             // TODO: не давать вызывать методы без возвращаемого значения
 			throw new RuntimeException("TR: Невозможно распарсить выражение");
