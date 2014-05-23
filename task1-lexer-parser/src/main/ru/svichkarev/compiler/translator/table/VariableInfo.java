@@ -33,6 +33,11 @@ public class VariableInfo{
         localsIndex = -1; // TODO: так ли надо
     }
 
+    // проверка инициализации
+    public boolean isInitialized() {
+        return initialization;
+    }
+
     // получить тип переменной
     public VariableType getType() {
         return type;

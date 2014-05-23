@@ -16,6 +16,7 @@ public class TableVariables {
         // TODO: полное копирование реализовать
     }
 
+    // TODO: переменная может не использоваться(но это уже похоже на оптимизацию)
     // добавление в таблицу новой переменной
     public void add( String variableName, VariableInfo varInfo) {
         // проверить на повторное объявление переменной
@@ -33,6 +34,16 @@ public class TableVariables {
     // проверка, объявлена ли переменная
     public boolean isDeclared( String variableName ) {
         return variables.containsKey(variableName);
+    }
+
+    // проверка, проинициализированна ли переменная
+    private boolean isInitialized( String variableName ) {
+        if( variables.containsKey(variableName) ){
+            return variables.get( variableName ).isInitialized();
+        } else{
+            // кинуть ошибку, переменная не объявлена
+            throw new RuntimeException( "TR: Переменная не объявлена" );
+        }
     }
 
     // установить флаг инициализации
@@ -57,6 +68,42 @@ public class TableVariables {
     // получить размер под локальные переменные
     public int getLocalSpace() {
         return lastLocalsShift;
+    }
+
+    // получить строку для загрузки значения из переменной на стек
+    public String getStrLoad( String variableName ){
+        // проверка, что такая переменная есть и проинициализированна
+        if( ! variables.containsKey( variableName ) ){
+            throw new RuntimeException("TR: не объявлена переменная");
+        }
+        if( ! isInitialized( variableName ) ){
+            throw new RuntimeException("TR: не проинициализированная переменная");
+        }
+
+        // TODO: тип переменной учесть
+        int indexLocals = getLocalIndex(variableName);
+        if( indexLocals < 4 ){
+            return "   iload_" + indexLocals + "\n";
+        } else{
+            return "   iload " + indexLocals + "\n";
+        }
+    }
+
+    // получить строку для загрузки значения из переменной на стек
+    public String getStrStore( String variableName ){
+        // проверка, что такая переменная есть и проинициализированна
+        if( ! variables.containsKey( variableName ) ){
+            throw new RuntimeException("TR: не объявлена переменная");
+        }
+
+        // TODO: тип переменной учесть
+        int indexLocals = getLocalIndex(variableName);
+        // TODO: константу в константы
+        if( indexLocals < 4 ){
+            return "   istore_" + indexLocals + "\n";
+        } else{
+            return "   istore " + indexLocals + "\n";
+        }
     }
 }
 

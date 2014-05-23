@@ -38,11 +38,6 @@ public class Translator {
         this.className = "test";
     }
 
-    // получить имя класса
-    public String getClassName() {
-        return className;
-    }
-
 	// главный метод - перевода программы в байт код
 	public void translateProgram() {
         // создаём таблицу функций
@@ -166,7 +161,10 @@ public class Translator {
         // TODO: подсчёт размера стека
         // подсчёт размера памяти под локальные переменные
         try {
-            writer.write( "   .limit locals " + tv.getLocalSpace() + "\n" );
+            writer.write(
+                    "   .limit stack 100\n" +
+                    "   .limit locals " + tv.getLocalSpace() + "\n"
+            );
         } catch (IOException e) {
             // TODO
             e.printStackTrace();
@@ -215,6 +213,7 @@ public class Translator {
 
 		// определяем тип команды:
         // TODO: добавить ещё if и while
+        String varName = null;
         Node operand = operands.get(0);
         switch( operand.getTokenType() ){
             // объявление переменной
@@ -228,7 +227,7 @@ public class Translator {
             case NAME:
                 // проверка, что переменная объявлена
                 // если объявлена, то в конце проставить инициализацию
-                String varName = (String) operand.getTokenValue();
+                varName = (String) operand.getTokenValue();
                 if( ! tv.isDeclared(varName) ){
                     // должна быть объявлена
                     throw new RuntimeException("Variable must be declared");
@@ -242,7 +241,7 @@ public class Translator {
 
                 // запускаем разбор поддерева выражения
                 try {
-                    exprType = translateExpr( exprNode );
+                    exprType = translateExpr( exprNode, tv, tf );
                 } catch (IOException e) {
                     // TODO Auto-generated catch block
                     e.printStackTrace();
@@ -257,14 +256,8 @@ public class Translator {
                 // TODO: организовать приведение int к double
 
                 // выполнить присвоение( снять со стека значение и положить в переменную )
-                int index = tv.getLocalIndex(varName);
                 try {
-                    // TODO: здесь не должно этого быть, это синтаксис
-                    if( index < 4 ){
-                        tmpWriter.write( "   istore_" + index + "\n" );
-                    } else {
-                        tmpWriter.write("   istore " + index + "\n");
-                    }
+                    tmpWriter.write( tv.getStrStore( varName ) );
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
@@ -315,7 +308,21 @@ public class Translator {
                 }*/
 
                 break;
-            case PRINT: // TODO: вспомнить как реализовывал
+            case PRINT:
+                // TODO: разница с append
+                // TODO: сделать такую же обёртку для вызовов функции, как и у переменных
+                // TODO: проверка правильной по типу println
+                varName = (String) operands.get(1).getTokenValue();
+                try {
+                    tmpWriter.write(
+                            "   getstatic java/lang/System/out Ljava/io/PrintStream;\n" +
+                            tv.getStrLoad( varName ) +
+                            "   invokevirtual java/io/PrintStream/println(I)V\n"
+                    );
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+
                 break;
             default:
                 // недопустимый тип команды
@@ -326,7 +333,7 @@ public class Translator {
 	// TODO: простая реализация, без вызова методов
 	//(и пока без возведения в степень, потому что нужно нужно функцию вызывать)
 	// разбираем поддерево выражения
-	private VariableInfo.VariableType translateExpr( Node exprNode ) throws IOException{
+	private VariableInfo.VariableType translateExpr( Node exprNode, TableVariables tv, TableFunctions tf ) throws IOException{
         // как минимум будет INT, но возможно расширение
         VariableInfo.VariableType exprType = VariableInfo.VariableType.INT;
 
@@ -334,11 +341,11 @@ public class Translator {
 		switch ( exprNode.getValue().getTokenType() ) {
 		case PLUS:
 			// рекурсивно вызываем для левого и правого поддерева
-			exprType = translateExpr(exprNode.getChildrens().get(0));
+			exprType = translateExpr(exprNode.getChildrens().get(0), tv, tf);
             if( exprType == VariableInfo.VariableType.INT ){
-                exprType = translateExpr(exprNode.getChildrens().get(1));
+                exprType = translateExpr(exprNode.getChildrens().get(1), tv, tf);
             } else {
-                translateExpr(exprNode.getChildrens().get(1));
+                translateExpr(exprNode.getChildrens().get(1), tv, tf);
             }
 
             // TODO: команда для нужного типа
@@ -349,34 +356,34 @@ public class Translator {
 		case MINUS:
 			// если унарный
 			if( exprNode.getChildrens().size() == 1 ){
-				exprType = translateExpr(exprNode.getChildrens().get(0));
+				exprType = translateExpr(exprNode.getChildrens().get(0), tv, tf);
 				tmpWriter.write( "   ineg\n" );
                 return exprType;
 			} else{
-				exprType = translateExpr(exprNode.getChildrens().get(0));
+				exprType = translateExpr(exprNode.getChildrens().get(0), tv, tf);
 				if( exprType == VariableInfo.VariableType.INT ){
-                    exprType = translateExpr(exprNode.getChildrens().get(1));
+                    exprType = translateExpr(exprNode.getChildrens().get(1), tv, tf);
                 } else {
-                    translateExpr(exprNode.getChildrens().get(1));
+                    translateExpr(exprNode.getChildrens().get(1), tv, tf);
                 }
 				tmpWriter.write( "   isub\n" );
                 return exprType;
 			}
 		case MULTIPLICATION:
-			exprType = translateExpr(exprNode.getChildrens().get(0));
+			exprType = translateExpr(exprNode.getChildrens().get(0), tv, tf);
             if( exprType == VariableInfo.VariableType.INT ) {
-                exprType = translateExpr(exprNode.getChildrens().get(1));
+                exprType = translateExpr(exprNode.getChildrens().get(1), tv, tf);
             } else {
-                translateExpr(exprNode.getChildrens().get(1));
+                translateExpr(exprNode.getChildrens().get(1), tv, tf);
             }
 			tmpWriter.write( "   imul\n" );
 			return exprType;
 		case DIVISION:
-			exprType = translateExpr(exprNode.getChildrens().get(0));
+			exprType = translateExpr(exprNode.getChildrens().get(0), tv, tf);
             if( exprType == VariableInfo.VariableType.INT ) {
-                exprType = translateExpr(exprNode.getChildrens().get(1));
+                exprType = translateExpr(exprNode.getChildrens().get(1), tv, tf);
             } else {
-                translateExpr(exprNode.getChildrens().get(1));
+                translateExpr(exprNode.getChildrens().get(1), tv, tf);
             }
 			tmpWriter.write( "   idiv\n" );
 			return exprType;
@@ -386,6 +393,10 @@ public class Translator {
 			tmpWriter.write( "   sipush " + exprNode.getValue().getTokenValue().toString() + "\n" );
 			// TODO: исправить
 			return exprType;
+        case NAME:
+            String varName = (String) exprNode.getTokenValue();
+            tmpWriter.write( tv.getStrLoad( varName ) );
+            return tv.getType( varName );
 		default:
             // TODO: не давать вызывать методы без возвращаемого значения
 			throw new RuntimeException("TR: Невозможно распарсить выражение");
