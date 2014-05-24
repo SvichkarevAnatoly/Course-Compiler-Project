@@ -5,7 +5,16 @@ import main.ru.svichkarev.compiler.lexer.TokenType;
 import java.util.Vector;
 
 public class FunctionInfo {
-    // TODO: добавить VOID в лексер
+    // проверяет возможность приведения
+    public boolean isCast(int indexArg, VariableInfo.VariableType actualVariableType) {
+        return parameterTypes.get( indexArg ).isCast( actualVariableType );
+    }
+
+    // возвращает строку приведения
+    public String castStr(int indexArg, VariableInfo.VariableType actualType) {
+        return parameterTypes.get( indexArg ).castStr( actualType );
+    }
+
     // для возвращаемого типа
     public enum FunctionReturnType{
         INT, DOUBLE, VOID;

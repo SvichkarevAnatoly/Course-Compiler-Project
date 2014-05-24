@@ -20,17 +20,7 @@ public class TableFunctions {
     // проверяет, есть ли метод main
     public boolean hasMain() {
         FunctionInfo main = functions.get( "main" );
-        if( main != null ){
-            if( main.getReturnType() == FunctionInfo.FunctionReturnType.VOID &&
-                main.getAmountParameters() == 0 ){
-
-                return true;
-            } else{
-                return false;
-            }
-        }else{
-            return false;
-        }
+        return (main != null && main.getReturnType() == FunctionInfo.FunctionReturnType.VOID && main.getAmountParameters() == 0);
     }
 
     // получает возвращаемый тип указанной функции
@@ -63,5 +53,15 @@ public class TableFunctions {
         }
 
         return className + "/" + funcStr;
+    }
+
+    // пробуем привести типы, возвращает приводящую строчку
+    public String castActualArg( String functionName, int indexArg, VariableInfo.VariableType type ){
+        FunctionInfo functionInfo = functions.get( functionName );
+        if( functionInfo.isCast( indexArg, type ) ){
+            return functionInfo.castStr( indexArg, type );
+        } else{
+            throw new RuntimeException("TR: при вызове " + functionName + " невозможно привети " + indexArg + " аргумент" );
+        }
     }
 }

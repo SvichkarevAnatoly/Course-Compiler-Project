@@ -17,6 +17,50 @@ public class VariableInfo{
                     throw new RuntimeException( "Недопустимый тип" );
             }
         }
+
+        // возможность приведения типов
+        public boolean isCast(VariableType actualVariableType) {
+            switch ( this ){
+                case DOUBLE:
+                    return true;
+                case INT:
+                    switch (actualVariableType){
+                        case INT:
+                            return true;
+                        case DOUBLE:
+                            return false;
+                    }
+                default:
+                    throw new RuntimeException( "Недопустимый тип" );
+            }
+        }
+
+        public String castStr(VariableType actualType) {
+            switch ( this ){
+                case DOUBLE:
+                    switch ( actualType ){
+                        case INT:
+                            return "   i2d\n";
+                        case DOUBLE:
+                            return "";
+                    }
+                case INT:
+                    return "";
+                default:
+                    throw new RuntimeException( "Недопустимый тип" );
+            }
+        }
+
+        public String toString(){
+            switch (this){
+                case INT:
+                    return "I";
+                case DOUBLE:
+                    return "D";
+                default:
+                    throw new RuntimeException( "TR: Недопустимый тип" );
+            }
+        }
     }
 
     private VariableType type;

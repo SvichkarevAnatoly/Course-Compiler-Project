@@ -127,6 +127,7 @@ public class Translator {
 
                 // добавление к таблице переменных
                 VariableInfo arg = new VariableInfo(argType.getTokenType());
+                arg.setInitialization();
                 tv.add((String) param.getTokenValue(), arg );
 
                 // заполнение вектора аргументов для таблицы функции
@@ -329,9 +330,8 @@ public class Translator {
                 throw new RuntimeException("Недопустимый тип команды");
         }
 	}
-	
-	// TODO: простая реализация, без вызова методов
-	//(и пока без возведения в степень, потому что нужно нужно функцию вызывать)
+
+	// TODO: пока без возведения в степень, потому что нужно нужно функцию вызывать
 	// разбираем поддерево выражения
 	private VariableInfo.VariableType translateExpr( Node exprNode, TableVariables tv, TableFunctions tf ) throws IOException{
         // как минимум будет INT, но возможно расширение
@@ -404,15 +404,23 @@ public class Translator {
             if( tf.getReturnType( funcName ) == FunctionInfo.FunctionReturnType.VOID ){
                 throw new RuntimeException("TR: в выражении не может участвовать функция, возвращающая void");
             } else{
-                // сверка фактических и формальных аргументов
-                // TODO: доработать сверку
-                // TODO: складывать аргументы на стек перед вызовом
-                if( tf.getAmountParameters( funcName ) == 0 &&
-                        exprNode.getChildren(1).getTokenType() == TokenType.EMPTY ){ // TODO: всегда ли есть EMPTY?
-                    tmpWriter.write( "   invokestatic " + tf.getStrCall( funcName ) + "\n" );
+                // перед вызовом функции вычисляем все выражения - фактические параметры
+                int numParams = exprNode.getChildren( 1 ).getChildrenCount();
+                if( numParams == tf.getAmountParameters( funcName ) ) {
+                    for (int i = 0; i < numParams; i++) {
+                        Node curActualArg = exprNode.getChildren(1).getChildren(i);
+                        exprType = translateExpr(curActualArg, tv, tf);
+                        // сверка фактических и формальных аргументов
+                        //попытка приведения
+                        String castStr = tf.castActualArg(funcName, i, exprType);
+                        tmpWriter.write( castStr );
+                    }
                 } else{
-                    throw new RuntimeException("TR: при вызове " + funcName + " несоответствие фактических и формальных аргументов" );
+                    throw new RuntimeException("TR: при вызове " + funcName + " несоответствие числа фактических и формальных аргументов" );
                 }
+
+                // вызов метода
+                tmpWriter.write( "   invokestatic " + tf.getStrCall( funcName ) + "\n" );
             }
 
             return tf.getReturnType( funcName ).convertToVariableType();

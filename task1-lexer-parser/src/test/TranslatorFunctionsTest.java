@@ -306,4 +306,15 @@ public class TranslatorFunctionsTest extends TestCase {
    return
 .end method
      */
+
+    /*
+    int foo( int k, int kk ){
+    return k + kk;
+}
+void main(){
+    int a;
+    a = foo( foo( 2, 5 ), 3 );
+    print( a );
+}
+     */
 }
