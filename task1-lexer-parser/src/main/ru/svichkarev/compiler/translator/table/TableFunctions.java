@@ -5,6 +5,12 @@ import java.util.Map;
 
 public class TableFunctions {
     private Map<String, FunctionInfo> functions = new HashMap<String, FunctionInfo>();
+    // для указания класса метода при вызове
+    private String className;
+
+    public TableFunctions( String className ) {
+        this.className = className;
+    }
 
     // добавляет функцию в таблицу
     public void add( String functionName, FunctionInfo functionInfo ) {
@@ -43,5 +49,19 @@ public class TableFunctions {
         }
 
         return functions.get( functionName ).getAmountParameters();
+    }
+
+    // вернуть строковое представление вызова функции
+    public String getStrCall(String functionName) {
+        String funcStr = functionName;
+        if( functions.containsKey( functionName ) ) {
+            FunctionInfo functionInfo = functions.get(functionName);
+            funcStr += "(" + functionInfo.getStrParameters() + ")" + functionInfo.getReturnType().toString();
+
+        } else{
+            throw new RuntimeException("TR: не объявлена функция");
+        }
+
+        return className + "/" + funcStr;
     }
 }

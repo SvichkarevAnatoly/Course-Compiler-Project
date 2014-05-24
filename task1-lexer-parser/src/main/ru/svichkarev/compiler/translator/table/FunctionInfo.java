@@ -64,4 +64,15 @@ public class FunctionInfo {
     public int getAmountParameters() {
         return parameterTypes.size();
     }
+
+    // возвращает строковое представление перечисления параметров
+    public String getStrParameters(){
+        String result = "";
+        for (int i = 0; i < parameterTypes.size(); i++) {
+            VariableInfo.VariableType variableType = parameterTypes.elementAt(i);
+            result += variableType.toString();
+        }
+
+        return result;
+    }
 }

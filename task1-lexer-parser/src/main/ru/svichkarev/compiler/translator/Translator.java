@@ -41,7 +41,7 @@ public class Translator {
 	// главный метод - перевода программы в байт код
 	public void translateProgram() {
         // создаём таблицу функций
-        TableFunctions tf = new TableFunctions();
+        TableFunctions tf = new TableFunctions( className );
 
         // TODO: делаем всякие подсчёты
         //вставим начало шаблона
@@ -99,11 +99,16 @@ public class Translator {
         TableVariables tv = new TableVariables();
         String functionName = (String) functionNode.getTokenValue();
 
+        // TODO: может можно переиспользовать?
+        // очистить от прошлой функции временный буфер
+        tmpWriter = new StringWriter();
+
         // разбираем возвращаемое значение и аргументы, выводим протатип функции
         FunctionInfo.FunctionReturnType returnType = FunctionInfo.FunctionReturnType.convertFromTokenType( functionNode.getFirstChildren().getFirstChildren().getTokenType() );
         Node parlistNode = functionNode.getChildren(1);
         Node bodyNode = functionNode.getChildren(2);
 
+        // TODO: для этого можно использовать таблицу функций
         // пишем заголовок метода
         String descriptorFunction = ".method public static ";
         descriptorFunction += functionNode.getTokenValue() + "(";
@@ -150,12 +155,16 @@ public class Translator {
             e.printStackTrace();
         }
 
+        // добавляем вновь созданную функцию
+        FunctionInfo curFunction = new FunctionInfo( returnType, paramsVec );
+        tf.add( functionName, curFunction);
+
         // пишем в другой источник, чтобы потом вставить подсчёт размера стека и локальных переменных
         // разбираем тело
         List<Node> commands = bodyNode.getChildrens();
         for (Iterator<Node> iterator = commands.iterator(); iterator.hasNext(); ) {
             Node command = iterator.next();
-            translateCommand( command, tv, tf );
+            translateCommand( command, tv, tf, functionName );
         }
 
         // TODO: подсчёт размера стека
@@ -185,25 +194,21 @@ public class Translator {
             if( returnType == FunctionInfo.FunctionReturnType.VOID ){
                 writer.write(
                     "   return\n" +
-                    ".end method\n"
+                    ".end method\n\n"
                 );
             } else{
                 writer.write(
-                    ".end method\n"
+                    ".end method\n\n"
                 );
             }
 
         } catch (IOException e) {
             e.printStackTrace();
         }
-
-        // добавляем вновь созданную функцию
-        FunctionInfo curFunction = new FunctionInfo( returnType, paramsVec );
-        tf.add( functionName, curFunction);
     }
 
     // транслирует команду
-	private void translateCommand(Node commandNode, TableVariables tv, TableFunctions tf){
+	private void translateCommand(Node commandNode, TableVariables tv, TableFunctions tf, String curFuncName){
         // Если не пустышка
         if( commandNode.getTokenType() == TokenType.EMPTY ){
             return;
@@ -214,6 +219,7 @@ public class Translator {
 		// определяем тип команды:
         // TODO: добавить ещё if и while
         String varName = null;
+        VariableInfo.VariableType exprType = null;
         Node operand = operands.get(0);
         switch( operand.getTokenType() ){
             // объявление переменной
@@ -237,7 +243,7 @@ public class Translator {
 
                 // дойдём до expr
                 Node exprNode = commandNode.getChildrens().get(2);
-                VariableInfo.VariableType exprType = VariableInfo.VariableType.INT;
+                exprType = VariableInfo.VariableType.INT;
 
                 // запускаем разбор поддерева выражения
                 try {
@@ -263,49 +269,43 @@ public class Translator {
                 }
 
                 break;
-            case RETURN: // TODO
-                /*// проверка, какой тип должна вернуть функция( из таблицы функций )
-                FunctionInfo.FunctionReturnType retType = tf.getCurrentFunctionReturnType();
+            case RETURN:
+                // проверка, какой тип должна вернуть функция( из таблицы функций )
+                FunctionInfo.FunctionReturnType retType = tf.getReturnType( curFuncName );
 
-                switch ( retType ){
-                    case VOID:
-                        // просто пишем возврат из функции
-                        try {
-                            writer.write( "   return\n" );
-                        } catch (IOException e) {
-                            e.printStackTrace();
-                        }
-                        break;
-                    case DOUBLE:
-                        VariableInfo.VariableType exprType = VariableInfo.VariableType.INT;
-                        // транслируем дальнейшее выражение
-                        exprNode = commandNode.getChildrens().get(1);
+                exprType = VariableInfo.VariableType.INT;
+                // транслируем дальнейшее выражение
+                exprNode = commandNode.getChildrens().get(1);
 
-                        // запускаем разбор поддерева выражения
-                        try {
-                            exprType = translateExpr( exprNode );
-                        } catch (IOException e) {
-                            // TODO Auto-generated catch block
-                            e.printStackTrace();
+                // запускаем разбор поддерева выражения
+                try {
+                    exprType = translateExpr( exprNode, tv, tf );
+                } catch (IOException e) {
+                    // TODO Auto-generated catch block
+                    e.printStackTrace();
+                }
+
+                try {
+                    if (retType == FunctionInfo.FunctionReturnType.INT) {
+                        if (exprType == VariableInfo.VariableType.INT) {
+                            tmpWriter.write( "   ireturn\n" );
+                        } else{
+                            throw new RuntimeException("TR: недопустимое приведение типов");
                         }
-                    case INT:
+                    } else{
                         if( exprType == VariableInfo.VariableType.DOUBLE ){
-                            try {
-                                writer.write( "   dreturn\n" );
-                            } catch (IOException e) {
-                                e.printStackTrace();
-                            }
-                        } else {
-                            try {
-                                writer.write( "   ireturn\n" );
-                            } catch (IOException e) {
-                                e.printStackTrace();
-                            }
+                            tmpWriter.write( "   dreturn\n" );
+                        } else{
+                            // TODO: приведение типов
+                            tmpWriter.write(
+                                    "   i2d\n" +
+                                    "   dreturn\n"
+                            );
                         }
-
-                        break;
-
-                }*/
+                    }
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
 
                 break;
             case PRINT:
@@ -406,8 +406,11 @@ public class Translator {
             } else{
                 // сверка фактических и формальных аргументов
                 // TODO: доработать сверку
-                if( !( tf.getAmountParameters( funcName ) == 0 &&
-                        exprNode.getChildrens().get(1).getChildrenCount() == 1) ){ // TODO: всегда ли есть EMPTY?
+                // TODO: складывать аргументы на стек перед вызовом
+                if( tf.getAmountParameters( funcName ) == 0 &&
+                        exprNode.getChildren(1).getTokenType() == TokenType.EMPTY ){ // TODO: всегда ли есть EMPTY?
+                    tmpWriter.write( "   invokestatic " + tf.getStrCall( funcName ) + "\n" );
+                } else{
                     throw new RuntimeException("TR: при вызове " + funcName + " несоответствие фактических и формальных аргументов" );
                 }
             }
