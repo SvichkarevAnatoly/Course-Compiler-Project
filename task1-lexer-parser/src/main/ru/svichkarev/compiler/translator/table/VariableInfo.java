@@ -77,6 +77,13 @@ public class VariableInfo{
         localsIndex = -1; // TODO: так ли надо
     }
 
+    // конструктор копирования
+    public VariableInfo( VariableInfo parentVarInf ){
+        this.initialization = parentVarInf.initialization;
+        this.type = parentVarInf.type;
+        this.localsIndex = parentVarInf.localsIndex;
+    }
+
     // проверка инициализации
     public boolean isInitialized() {
         return initialization;

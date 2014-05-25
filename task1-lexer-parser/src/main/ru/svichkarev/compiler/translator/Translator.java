@@ -326,6 +326,91 @@ public class Translator {
                 }
 
                 break;
+            case IF:
+                // похоже на реализацию функции, т.е.
+                //свой цикл по командам, своя таблица переменных
+
+                // TODO: нужно потом мержить две(три) таблицы,
+                //чтобы поддерживать состояние инициализации
+
+                // создаём копию таблицы переменных, чтобы таблица функции осталась цела
+                TableVariables tvIf = new TableVariables( tv );
+
+                // разбор условия
+                Node exprCond1Node = commandNode.getChildren(1).getFirstChildren();
+                Node exprCond2Node = commandNode.getChildren(1).getChildren(2);
+
+                // TODO: разобраться с типами в условии, пока без них
+                try {
+                    translateExpr(exprCond1Node, tv, tf);
+                    translateExpr(exprCond2Node, tv, tf);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+
+                // вставка условия перехода
+                String condStr = (String) commandNode.getChildren(1).getChildren(1).getTokenValue();
+                String condTranslateStr = "";
+
+                // TODO: сделать генерацию меток, к примеру else1113
+                String labelElse = "else";
+                String labelEndIf = "endif";
+
+                // TODO: доделать остальные условные знаки
+                if( condStr.equals( ">" ) ){
+                    try {
+                        tmpWriter.write( "   if_icmple " + labelElse + "\n" );
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                } else{
+                    throw new RuntimeException( "TR: Недопустимый условие" );
+                }
+
+                // разбор верной ветви
+                Node bodyIfNode = commandNode.getChildren(2);
+                List<Node> commands = bodyIfNode.getChildrens();
+                for (Iterator<Node> iterator = commands.iterator(); iterator.hasNext(); ) {
+                    Node command = iterator.next();
+                    translateCommand( command, tvIf, tf, curFuncName );
+                }
+
+                // TODO: сделать вариант с одной веткой
+                try {
+                    tmpWriter.write(
+                            "   goto " + labelEndIf + "\n" +
+                            labelElse + ":\n"
+                    );
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+
+                // проверка есть ли ветвь else
+                if( commandNode.getChildrenCount() == 4 ){
+                    // копия таблицы переменных
+                    TableVariables tvElse = new TableVariables( tv );
+
+                    // разбор ветви else
+                    Node bodyElseNode = commandNode.getChildren(3);
+                    commands = bodyElseNode.getChildrens();
+                    for (Iterator<Node> iterator = commands.iterator(); iterator.hasNext(); ) {
+                        Node command = iterator.next();
+                        translateCommand( command, tvElse, tf, curFuncName );
+                    }
+
+                    // закрывающая метка
+                    try {
+                        tmpWriter.write( labelEndIf + ":\n" );
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                }
+
+                // TODO: сверка таблиц
+
+                break;
+            case WHILE:
+                break;
             default:
                 // недопустимый тип команды
                 throw new RuntimeException("Недопустимый тип команды");

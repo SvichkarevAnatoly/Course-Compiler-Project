@@ -28,3 +28,4 @@ rettype -> void | int | double
 E - empty word
 [...] - any word of brackets
 print ( name ) - name is only of variable
+if and while without ';'

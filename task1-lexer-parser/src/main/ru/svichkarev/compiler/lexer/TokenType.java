@@ -24,15 +24,19 @@ public enum TokenType {
 	ARG_LIST,
 	
 	TYPE,
-	INT, DOUBLE, VOID, // TODO: добавить в лексер и раньше обработку VOID
+	INT, DOUBLE, VOID,
 	
 	ASSIGNMENT, // присваивание
-	
+	CONDITION, // условие
+    SIGN, // знак условия
+
 	RETURN,
-	
-	// TODO: нужен ли
+
 	CALL_FUNCTION,
 	PRINT,
-	
+
+    IF, ELSE,
+    WHILE,
+
 	END,
 }

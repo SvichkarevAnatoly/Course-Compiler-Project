@@ -145,13 +145,16 @@ public class Parser {
 		// начинаем парсить команды пока не вернёт пусто
 		Node command = parseCommand();
 		result.setLeft( command );
-		
+
 		do{
-			Token<?> semicolonToken = lexer.getToken();
-			if( ! semicolonToken.match( TokenType.SEMICOLON ) ){
-				// TODO кинуть ошибку
-                throw new RuntimeException("проверить");
-			}
+            // исключение из правил: если if и while, то точку с запятой не нужно ставить
+            if( !( command.getFirstChildren().getTokenType() == TokenType.IF ||
+                    command.getFirstChildren().getTokenType() == TokenType.WHILE) ) {
+                Token<?> semicolonToken = lexer.getToken();
+                if (!semicolonToken.match(TokenType.SEMICOLON)) {
+                    throw new RuntimeException("P: после команды должна следовать \";\"");
+                }
+            }
 			command = parseCommand();
 			result.setRight( command );
 		} while( ! command.getValue().match( TokenType.EMPTY ) );
@@ -161,7 +164,7 @@ public class Parser {
 	
 	public Node parseCommand(){
 		Node result = new Node( TokenType.COMMAND );
-		
+
 		Token<?> whatEver = lexer.peekToken();
 		switch( whatEver.getTokenType() ){
 		case BRACE_CLOSE: // это уже не команда, вернуть пустоту
@@ -188,6 +191,7 @@ public class Parser {
 			Token<?> assignToken = lexer.getToken();
 			if( assignToken.match( TokenType.ASSIGNMENT ) ){
 				result.setLeft( new Node(whatEver) );
+                // TODO: нет необходимости добавлять
 				result.setRight( new Node( assignToken ) );
 				result.setRight( parseExpr() );
 			}else{
@@ -208,6 +212,7 @@ public class Parser {
 				// TODO: кинуть ошибку
                 throw new RuntimeException("проверить");
 			}
+            // TODO: стоит сделать expr
 			Token<?> nameVariable = lexer.getToken();
 			if( ! nameVariable.match( TokenType.NAME ) ){
 				// TODO: кинуть ошибку
@@ -222,15 +227,99 @@ public class Parser {
 			result.setRight( new Node( nameVariable ) );
 			
 			break;
+        case IF:
+            lexer.getToken();
+            Token<?> openBracketIfToken = lexer.getToken();
+            if( ! openBracketIfToken.match( TokenType.BRACKET_OPEN ) ){
+                throw new RuntimeException("P: ожидалась открывающаяся скобка после if");
+            }
+
+            result.setLeft( new Node(whatEver) );
+            result.setRight( parseCondition() );
+
+            Token<?> closeBracketIfToken = lexer.getToken();
+            if( ! closeBracketIfToken.match( TokenType.BRACKET_CLOSE ) ){
+                throw new RuntimeException("P: ожидалась закрывающаяся скобка после условия");
+            }
+
+            // TODO: попытаться отказаться от обязательных скобок
+            Token<?> openBracketThenToken = lexer.getToken();
+            if( ! openBracketThenToken.match( TokenType.BRACE_OPEN ) ){
+                throw new RuntimeException("P: ожидалась открывающаяся фигурная скобка ветви if");
+            }
+            // ветвь then
+            result.setRight( parseBody() );
+            Token<?> closeBracketThenToken = lexer.getToken();
+            if( ! closeBracketThenToken.match( TokenType.BRACE_CLOSE ) ){
+                throw new RuntimeException("P: ожидалась закрывающаяся фигурная скобка ветви if");
+            }
+
+            // дальше может быть часть else, а может и не быть
+            Token<?> elseToken = lexer.peekToken();
+            if( elseToken.match( TokenType.ELSE ) ){
+                // есть else ветвь
+                lexer.getToken();
+                Token<?> openBraceElseToken = lexer.getToken();
+                if( ! openBraceElseToken.match( TokenType.BRACE_OPEN ) ){
+                    throw new RuntimeException("P: ожидалась открывающаяся фигурная скобка после else");
+                }
+                // добавляем else часть
+                result.setRight( parseBody() );
+                Token<?> closeBraceElseToken = lexer.getToken();
+                if( ! closeBraceElseToken.match( TokenType.BRACE_CLOSE ) ){
+                    throw new RuntimeException("P: ожидалась закрывающаяся фигурная скобка ветви else");
+                }
+            }
+
+            break;
+        case WHILE:
+            lexer.getToken();
+            Token<?> openBracketWhileToken = lexer.getToken();
+            if( ! openBracketWhileToken.match( TokenType.BRACKET_OPEN ) ){
+                throw new RuntimeException("P: ожидалась открывающаяся скобка после if");
+            }
+
+            result.setLeft( new Node(whatEver) );
+            result.setRight( parseCondition() );
+
+            Token<?> closeBracketWhileToken = lexer.getToken();
+            if( ! closeBracketWhileToken.match( TokenType.BRACKET_CLOSE ) ){
+                throw new RuntimeException("P: ожидалась закрывающаяся скобка после условия");
+            }
+
+            Token<?> openBraceWhileToken = lexer.getToken();
+            if( ! openBraceWhileToken.match( TokenType.BRACE_OPEN ) ){
+                throw new RuntimeException("P: ожидалась открывающаяся фигурная скобка ветви if");
+            }
+
+            result.setRight( parseBody() );
+
+            Token<?> closeBraceWhileToken = lexer.getToken();
+            if( ! closeBraceWhileToken.match( TokenType.BRACE_CLOSE ) ){
+                throw new RuntimeException("P: ожидалась закрывающаяся фигурная скобка ветви if");
+            }
 		default:
-			// TODO кинуть исключение
-            throw new RuntimeException("проверить");
+            throw new RuntimeException("P: неизвестная команда");
 		}
 		
 		return result;
 	}
-	
-	public Node parseArgList(){
+
+    private Node parseCondition() {
+        Node result = new Node( TokenType.CONDITION );
+
+        result.setLeft( parseExpr() );
+        Token<?> signToken = lexer.getToken();
+        if( ! signToken.match( TokenType.SIGN ) ){
+            throw new RuntimeException("P: ожидался знак условия");
+        }
+        result.setRight( new Node(signToken) );
+        result.setRight( parseExpr() );
+
+        return result;
+    }
+
+    public Node parseArgList(){
 		//правило вывода:
 		//args -> expr , args | expr вырождается
 		

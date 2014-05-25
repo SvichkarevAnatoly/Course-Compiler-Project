@@ -81,9 +81,6 @@ public class Lexer {
 		case ';':
 			currentToken = new Token<Object>( TokenType.SEMICOLON );
 			break;
-		case '=':
-			currentToken = new Token<Object>( TokenType.ASSIGNMENT );
-			break;
 			
 		default:
 			// цифра или число возможно
@@ -94,7 +91,8 @@ public class Lexer {
 				if( Character.isAlphabetic( curChar ) || curChar == '_' ){
 					currentToken = getIdentificatorFromBuffer( curChar );
 				}else{
-					// TODO: кинуть исключение если фигня
+                    // возможно это знак условия
+                    currentToken = getConditionSignFromBuffer( curChar );
 				}
 			}
 			
@@ -102,7 +100,38 @@ public class Lexer {
 		}
 	}
 
-	// выискиваем комментарии и разделительные символы и удаляем
+    private Token<?> getConditionSignFromBuffer(char curChar) {
+        String sign = Character.toString(curChar);
+
+        // может быть двухсимвольный знак, т.е. идёт следом '='
+        if (peekCharFromBuffer(0) == '=') {
+            sign += buffer.getChar();
+        }
+
+        Token<?> result = null;
+        if( sign.equals("=") ) {
+            result = new Token<Object>(TokenType.ASSIGNMENT);
+        }else if (sign.equals("<")) {
+            result = new Token<String>(TokenType.SIGN, "<");
+        } else if (sign.equals("<=")) {
+            result = new Token<String>(TokenType.SIGN, "<=");
+        } else if (sign.equals("==")) {
+            result = new Token<String>(TokenType.SIGN, "==");
+        } else if (sign.equals("!=")) {
+            result = new Token<String>(TokenType.SIGN, "!=");
+        } else if (sign.equals(">")) {
+            result = new Token<String>(TokenType.SIGN, ">");
+        } else if (sign.equals(">=")) {
+            result = new Token<String>(TokenType.SIGN, ">=");
+        } else{
+            // тогда это непонятно что
+            throw new RuntimeException("L: неопределённая лексема");
+        }
+
+        return result;
+    }
+
+    // выискиваем комментарии и разделительные символы и удаляем
 	private void readThroughSpacesAndComments(){
 		// пока не наткнёмся на не разделительный символ или не коментарий
 		while( true ){
@@ -228,24 +257,29 @@ public class Lexer {
 		}else{
 			char nextChar = (char) peekCharFromBuffer( 0 );
 			switch (nextChar) {
-			case ' ':
-			// сразу знак арифметического выражения
-			case '+':
-			case '-':
-			case '*':
-			case '/':
-			case '^':
-			// всякая пунктуация
-			case '(':
-			case ')':
-			case '{':
-			case ',':
-			case ';':
-			case '=':
-				break;
-			default:
-				// TODO: какая-то фигня впритык, кинуть ошибку
-				break;
+                case ' ':
+                // сразу знак арифметического выражения
+                case '+':
+                case '-':
+                case '*':
+                case '/':
+                case '^':
+                // всякая пунктуация
+                case '(':
+                case ')':
+                case '{':
+                case ',':
+                case ';':
+                case '=':
+                // TODO: проверить и доработать
+                // знаки сравнения
+                case '<':
+                case '>':
+                case '!':
+                    break;
+                default:
+                    // TODO: какая-то фигня впритык, кинуть ошибку
+                    break;
 			}
 		}
 		
@@ -263,6 +297,12 @@ public class Lexer {
 			result = new Token<Object>( TokenType.PRINT );
 		} else if( ident.equals( "void" ) ) {
             result = new Token<Object>( TokenType.VOID );
+        } else if( ident.equals( "if" ) ) {
+            result = new Token<Object>( TokenType.IF );
+        } else if( ident.equals( "else" ) ) {
+            result = new Token<Object>(TokenType.ELSE);
+        } else if( ident.equals("while") ) {
+            result = new Token<Object>(TokenType.WHILE);
         } else{
 			result = new Token<String>( TokenType.NAME, ident );
 		}

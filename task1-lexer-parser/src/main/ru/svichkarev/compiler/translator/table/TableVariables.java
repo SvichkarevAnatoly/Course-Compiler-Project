@@ -13,7 +13,12 @@ public class TableVariables {
 
     // конструктор копирования для веток в условных операторах
     public TableVariables( TableVariables parent ) {
-        // TODO: полное копирование реализовать
+        for( Map.Entry<String, VariableInfo> entry : parent.variables.entrySet() ){
+            VariableInfo curVarInf = new VariableInfo( entry.getValue() );
+            this.variables.put( entry.getKey(), curVarInf );
+        }
+
+        this.lastLocalsShift = parent.lastLocalsShift;
     }
 
     // TODO: переменная может не использоваться(но это уже похоже на оптимизацию)
