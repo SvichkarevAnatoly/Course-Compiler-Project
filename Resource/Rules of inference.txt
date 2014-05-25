@@ -1,13 +1,16 @@
 ==================Rules==================
 program -> function functionList
 functionList -> function functionList | E
-function -> type name ( parlist ) { body }
+function -> rettype name ( parlist ) { body }
 
 parlist -> type name | type name , params | E
 params -> type name , params | type name
 
 body -> command ; body | E
-command -> type name | name = expr | return expr | print ( name )
+command -> type name | name = expr | return expr | print ( name ) | if ( condition ) { body } else { body } | while( condition ){ body }
+
+condition -> expr sign expr
+sign -> < | <= | == | != | > | >=
 
 expr -> term [+-] term [+-] ... [+-] term // неформально определены
 term -> factor [*/] factor [*/] ... [*/] factor // неформально определены
@@ -19,6 +22,7 @@ arglist -> expr | args | E
 args -> expr , args | expr
 
 type -> int | double
+rettype -> void | int | double
 
 ==================Reference==============
 E - empty word

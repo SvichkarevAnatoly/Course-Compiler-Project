@@ -257,7 +257,9 @@ public class Parser {
 		
 		return result;
 	}
-	
+
+    // TODO: разделить на 2 функции,
+    //одна для аргументов, другая для возвращаемого значения
 	public Node parseType(){
 		Node result = null;
 		

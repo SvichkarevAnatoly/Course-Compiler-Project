@@ -286,6 +286,7 @@ public class Translator {
                     e.printStackTrace();
                 }
 
+                // TODO: расставлять return для каждой ветки, проверять это как-то
                 try {
                     if (retType == FunctionInfo.FunctionReturnType.INT) {
                         if (exprType == VariableInfo.VariableType.INT) {
