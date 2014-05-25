@@ -20,6 +20,7 @@ public class Translator {
 
     private Writer tmpWriter;
     private String className;
+    private ControlGenerator cg = new ControlGenerator();
 
 	public Translator( Node inputTree, Writer writer, String className ){
 		tree = inputTree;
@@ -330,65 +331,59 @@ public class Translator {
                 // похоже на реализацию функции, т.е.
                 //свой цикл по командам, своя таблица переменных
 
-                // TODO: нужно потом мержить две(три) таблицы,
+                // TODO: нужно потом мержить только три таблицы,
                 //чтобы поддерживать состояние инициализации
 
                 // создаём копию таблицы переменных, чтобы таблица функции осталась цела
                 TableVariables tvIf = new TableVariables( tv );
 
                 // разбор условия
-                Node exprCond1Node = commandNode.getChildren(1).getFirstChildren();
-                Node exprCond2Node = commandNode.getChildren(1).getChildren(2);
+                Node condExpr1Node = commandNode.getChildren(1).getChildren(0);
+                Node condExpr2Node = commandNode.getChildren(1).getChildren(2);
 
                 // TODO: разобраться с типами в условии, пока без них
                 try {
-                    translateExpr(exprCond1Node, tv, tf);
-                    translateExpr(exprCond2Node, tv, tf);
+                    translateExpr(condExpr1Node, tv, tf);
+                    translateExpr(condExpr2Node, tv, tf);
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
 
                 // вставка условия перехода
                 String condStr = (String) commandNode.getChildren(1).getChildren(1).getTokenValue();
-                String condTranslateStr = "";
 
-                // TODO: сделать генерацию меток, к примеру else1113
-                String labelElse = "else";
-                String labelEndIf = "endif";
+                // определение вида if: с веткой else или без
+                if( commandNode.getChildrenCount() == 4 ){
+                    // с else веткой
 
-                // TODO: доделать остальные условные знаки
-                if( condStr.equals( ">" ) ){
+                    // копия таблицы переменных
+                    TableVariables tvElse = new TableVariables( tv );
+
+                    // вставка начала
                     try {
-                        tmpWriter.write( "   if_icmple " + labelElse + "\n" );
+                        tmpWriter.write(
+                                cg.getStrStatementPart(ControlGenerator.StatementWithCondition.IF_ELSE_BEGIN, condStr )
+                        );
                     } catch (IOException e) {
                         e.printStackTrace();
                     }
-                } else{
-                    throw new RuntimeException( "TR: Недопустимый условие" );
-                }
 
-                // разбор верной ветви
-                Node bodyIfNode = commandNode.getChildren(2);
-                List<Node> commands = bodyIfNode.getChildrens();
-                for (Iterator<Node> iterator = commands.iterator(); iterator.hasNext(); ) {
-                    Node command = iterator.next();
-                    translateCommand( command, tvIf, tf, curFuncName );
-                }
+                    // разбор верной ветви
+                    Node bodyIfNode = commandNode.getChildren(2);
+                    List<Node> commands = bodyIfNode.getChildrens();
+                    for (Iterator<Node> iterator = commands.iterator(); iterator.hasNext(); ) {
+                        Node command = iterator.next();
+                        translateCommand( command, tvIf, tf, curFuncName );
+                    }
 
-                // TODO: сделать вариант с одной веткой
-                try {
-                    tmpWriter.write(
-                            "   goto " + labelEndIf + "\n" +
-                            labelElse + ":\n"
-                    );
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-
-                // проверка есть ли ветвь else
-                if( commandNode.getChildrenCount() == 4 ){
-                    // копия таблицы переменных
-                    TableVariables tvElse = new TableVariables( tv );
+                    // вставка середины
+                    try {
+                        tmpWriter.write(
+                                cg.getStrStatementPart(ControlGenerator.Statement.IF_ELSE_MIDDLE )
+                        );
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
 
                     // разбор ветви else
                     Node bodyElseNode = commandNode.getChildren(3);
@@ -398,9 +393,38 @@ public class Translator {
                         translateCommand( command, tvElse, tf, curFuncName );
                     }
 
-                    // закрывающая метка
+                    // вставка конца
                     try {
-                        tmpWriter.write( labelEndIf + ":\n" );
+                        tmpWriter.write(
+                                cg.getStrStatementPart(ControlGenerator.Statement.IF_ELSE_END )
+                        );
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                } else{
+                    // просто ветка if
+                    // вставка начала
+                    try {
+                        tmpWriter.write(
+                                cg.getStrStatementPart(ControlGenerator.StatementWithCondition.IF_BEDIN, condStr )
+                        );
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+
+                    // разбор верной ветви
+                    Node bodyIfNode = commandNode.getChildren(2);
+                    List<Node> commands = bodyIfNode.getChildrens();
+                    for (Iterator<Node> iterator = commands.iterator(); iterator.hasNext(); ) {
+                        Node command = iterator.next();
+                        translateCommand( command, tvIf, tf, curFuncName );
+                    }
+
+                    // вставка конца
+                    try {
+                        tmpWriter.write(
+                                cg.getStrStatementPart(ControlGenerator.Statement.IF_END )
+                        );
                     } catch (IOException e) {
                         e.printStackTrace();
                     }
@@ -410,6 +434,61 @@ public class Translator {
 
                 break;
             case WHILE:
+                // создаём копию таблицы переменных, чтобы таблица функции осталась цела
+                TableVariables tvWhile = new TableVariables( tv );
+
+                // разбор условия
+                condExpr1Node = commandNode.getChildren(1).getChildren(0);
+                condExpr2Node = commandNode.getChildren(1).getChildren(2);
+
+                // вставка условия перехода
+                condStr = (String) commandNode.getChildren(1).getChildren(1).getTokenValue();
+
+                // вставка начала(только метка)
+                try {
+                    tmpWriter.write(
+                            cg.getStrStatementPart(ControlGenerator.Statement.WHILE_BEGIN_LABEL )
+                    );
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+
+                // TODO: разобраться с типами в условии, пока без них
+                try {
+                    translateExpr(condExpr1Node, tv, tf);
+                    translateExpr(condExpr2Node, tv, tf);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+
+                // вставка начала(продолжение)
+                try {
+                    tmpWriter.write(
+                            cg.getStrStatementPart(ControlGenerator.StatementWithCondition.WHILE_BEGIN, condStr )
+                    );
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+
+                // разбор верной ветви
+                Node bodyWhileNode = commandNode.getChildren(2);
+                List<Node> commands = bodyWhileNode.getChildrens();
+                for (Iterator<Node> iterator = commands.iterator(); iterator.hasNext(); ) {
+                    Node command = iterator.next();
+                    translateCommand( command, tvWhile, tf, curFuncName );
+                }
+
+                // вставка конца
+                try {
+                    tmpWriter.write(
+                            cg.getStrStatementPart(ControlGenerator.Statement.WHILE_END )
+                    );
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+
+                // TODO: сверка таблиц
+
                 break;
             default:
                 // недопустимый тип команды

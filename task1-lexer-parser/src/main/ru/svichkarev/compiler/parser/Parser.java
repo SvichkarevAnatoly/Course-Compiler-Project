@@ -276,7 +276,7 @@ public class Parser {
             lexer.getToken();
             Token<?> openBracketWhileToken = lexer.getToken();
             if( ! openBracketWhileToken.match( TokenType.BRACKET_OPEN ) ){
-                throw new RuntimeException("P: ожидалась открывающаяся скобка после if");
+                throw new RuntimeException("P: ожидалась открывающаяся скобка после while");
             }
 
             result.setLeft( new Node(whatEver) );
@@ -289,15 +289,16 @@ public class Parser {
 
             Token<?> openBraceWhileToken = lexer.getToken();
             if( ! openBraceWhileToken.match( TokenType.BRACE_OPEN ) ){
-                throw new RuntimeException("P: ожидалась открывающаяся фигурная скобка ветви if");
+                throw new RuntimeException("P: ожидалась открывающаяся фигурная скобка тела цикла");
             }
 
             result.setRight( parseBody() );
 
             Token<?> closeBraceWhileToken = lexer.getToken();
             if( ! closeBraceWhileToken.match( TokenType.BRACE_CLOSE ) ){
-                throw new RuntimeException("P: ожидалась закрывающаяся фигурная скобка ветви if");
+                throw new RuntimeException("P: ожидалась закрывающаяся фигурная скобка тела цикла");
             }
+            break;
 		default:
             throw new RuntimeException("P: неизвестная команда");
 		}
