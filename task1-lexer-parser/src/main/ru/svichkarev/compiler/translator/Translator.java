@@ -99,6 +99,8 @@ public class Translator {
         // создаём таблицу переменных
         TableVariables tv = new TableVariables();
         String functionName = (String) functionNode.getTokenValue();
+        // максимальное смещение
+        int maxLocalsShift = 0;
 
         // TODO: может можно переиспользовать?
         // очистить от прошлой функции временный буфер
@@ -174,7 +176,7 @@ public class Translator {
         try {
             writer.write(
                     "   .limit stack 100\n" +
-                    "   .limit locals " + tv.getLocalSpace() + "\n"
+                    "   .limit locals " + tv.getMaxLocalsShift() + "\n"
             );
         } catch (IOException e) {
             // TODO
@@ -376,6 +378,9 @@ public class Translator {
                         translateCommand( command, tvIf, tf, curFuncName );
                     }
 
+                    // обновление максимума
+                    tv.updateLocalSpace( tvIf.getMaxLocalsShift() );
+
                     // вставка середины
                     try {
                         tmpWriter.write(
@@ -392,6 +397,9 @@ public class Translator {
                         Node command = iterator.next();
                         translateCommand( command, tvElse, tf, curFuncName );
                     }
+
+                    // обновление максимума
+                    tv.updateLocalSpace( tvElse.getMaxLocalsShift() );
 
                     // вставка конца
                     try {
@@ -419,6 +427,9 @@ public class Translator {
                         Node command = iterator.next();
                         translateCommand( command, tvIf, tf, curFuncName );
                     }
+
+                    // обновление максимума
+                    tv.updateLocalSpace( tvIf.getMaxLocalsShift() );
 
                     // вставка конца
                     try {

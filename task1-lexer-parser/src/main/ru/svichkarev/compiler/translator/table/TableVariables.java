@@ -7,6 +7,8 @@ public class TableVariables {
     private Map<String, VariableInfo> variables = new HashMap<String, VariableInfo>();
     // хранит последнее смещение для переменной
     private int lastLocalsShift = 0;
+    // максимальное смещение для переменных
+    private int maxLocalsShift = 0;
 
     // нужен обычный конструктор, если есть конструктор копирования
     public TableVariables(){}
@@ -71,8 +73,11 @@ public class TableVariables {
     }
 
     // получить размер под локальные переменные
-    public int getLocalSpace() {
-        return lastLocalsShift;
+    //подаём текущий размер, если локальный больше, вернуть его
+    public void updateLocalSpace(int maxLocalsShift) {
+        if( maxLocalsShift > this.maxLocalsShift ){
+            this.maxLocalsShift = maxLocalsShift;
+        }
     }
 
     // получить строку для загрузки значения из переменной на стек
@@ -108,6 +113,15 @@ public class TableVariables {
             return "   istore_" + indexLocals + "\n";
         } else{
             return "   istore " + indexLocals + "\n";
+        }
+    }
+
+    // возвращает максимальное смещение
+    public int getMaxLocalsShift() {
+        if( maxLocalsShift > lastLocalsShift ){
+            return maxLocalsShift;
+        } else{
+            return lastLocalsShift;
         }
     }
 }
