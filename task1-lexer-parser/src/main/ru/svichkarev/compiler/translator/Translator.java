@@ -572,41 +572,123 @@ public class Translator {
 			// если унарный
 			if( exprNode.getChildrens().size() == 1 ){
 				exprType = translateExpr(exprNode.getChildrens().get(0), tv, tf);
-				tmpWriter.write( "   ineg\n" );
+
+                if( exprType == VariableInfo.VariableType.INT ){
+                    tmpWriter.write( "   ineg\n" );
+                } else{
+                    tmpWriter.write( "   dneg\n" );
+                }
+
                 return exprType;
 			} else{
 				exprType = translateExpr(exprNode.getChildrens().get(0), tv, tf);
-				if( exprType == VariableInfo.VariableType.INT ){
+                if( exprType == VariableInfo.VariableType.INT ){
                     exprType = translateExpr(exprNode.getChildrens().get(1), tv, tf);
+                    if( exprType == VariableInfo.VariableType.INT ){
+                        tmpWriter.write( "   isub\n" );
+                    } else {
+                        // перевернуть, привести, обратно перевернуть
+                        tmpWriter.write(
+                                "   \n" +
+                                        "   dup2_x1\n" +
+                                        "   pop2\n" +
+                                        "   i2d\n" +
+                                        "   \n" +
+                                        "   dup2_x2\n" +
+                                        "   pop2\n" +
+                                        "   dsub\n" +
+                                        "\n"
+                        );
+                    }
                 } else {
-                    translateExpr(exprNode.getChildrens().get(1), tv, tf);
+                    exprType = translateExpr(exprNode.getChildrens().get(1), tv, tf);
+                    if( exprType == VariableInfo.VariableType.INT ){
+                        // привести int к double
+                        tmpWriter.write(
+                                "   i2d\n" +
+                                "   dsub\n"
+                        );
+                        exprType = VariableInfo.VariableType.DOUBLE;
+                    } else{
+                        tmpWriter.write( "   dsub\n" );
+                    }
                 }
-				tmpWriter.write( "   isub\n" );
+
                 return exprType;
 			}
 		case MULTIPLICATION:
 			exprType = translateExpr(exprNode.getChildrens().get(0), tv, tf);
-            if( exprType == VariableInfo.VariableType.INT ) {
+            if( exprType == VariableInfo.VariableType.INT ){
                 exprType = translateExpr(exprNode.getChildrens().get(1), tv, tf);
+                if( exprType == VariableInfo.VariableType.INT ){
+                    tmpWriter.write( "   imul\n" );
+                } else {
+                    // перевернуть, привести, обратно перевернуть
+                    tmpWriter.write(
+                            "   \n" +
+                                    "   dup2_x1\n" +
+                                    "   pop2\n" +
+                                    "   i2d\n" +
+                                    "   \n" +
+                                    "   dup2_x2\n" +
+                                    "   pop2\n" +
+                                    "   dmul\n" +
+                                    "\n"
+                    );
+                }
             } else {
-                translateExpr(exprNode.getChildrens().get(1), tv, tf);
+                exprType = translateExpr(exprNode.getChildrens().get(1), tv, tf);
+                if( exprType == VariableInfo.VariableType.INT ){
+                    // привести int к double
+                    tmpWriter.write(
+                            "   i2d\n" +
+                            "   dmul\n"
+                    );
+                    exprType = VariableInfo.VariableType.DOUBLE;
+                } else{
+                    tmpWriter.write( "   dmul\n" );
+                }
             }
-			tmpWriter.write( "   imul\n" );
 			return exprType;
 		case DIVISION:
 			exprType = translateExpr(exprNode.getChildrens().get(0), tv, tf);
-            if( exprType == VariableInfo.VariableType.INT ) {
+            if( exprType == VariableInfo.VariableType.INT ){
                 exprType = translateExpr(exprNode.getChildrens().get(1), tv, tf);
+                if( exprType == VariableInfo.VariableType.INT ){
+                    tmpWriter.write( "   idiv\n" );
+                } else {
+                    // перевернуть, привести, обратно перевернуть
+                    tmpWriter.write(
+                            "   \n" +
+                                    "   dup2_x1\n" +
+                                    "   pop2\n" +
+                                    "   i2d\n" +
+                                    "   \n" +
+                                    "   dup2_x2\n" +
+                                    "   pop2\n" +
+                                    "   ddiv\n" +
+                                    "\n"
+                    );
+                }
             } else {
-                translateExpr(exprNode.getChildrens().get(1), tv, tf);
+                exprType = translateExpr(exprNode.getChildrens().get(1), tv, tf);
+                if( exprType == VariableInfo.VariableType.INT ){
+                    // привести int к double
+                    tmpWriter.write(
+                            "   i2d\n" +
+                            "   ddiv\n"
+                    );
+                    exprType = VariableInfo.VariableType.DOUBLE;
+                } else{
+                    tmpWriter.write( "   ddiv\n" );
+                }
             }
-			tmpWriter.write( "   idiv\n" );
 			return exprType;
         // TODO: нужно конкретно определить тип
 		case NUMBER:
             // определение типа
-            double val = Double.parseDouble(exprNode.getValue().getTokenValue().toString());
-            if( val == (int)val ){ // TODO: странное определение типа
+            boolean isDouble = exprNode.getValue().getTokenValue().toString().contains(".");
+            if( ! isDouble ){ // TODO: странное определение типа
                 // тогда intf
                 //range -32768 to 32767
                 tmpWriter.write( "   sipush " + exprNode.getValue().getTokenValue().toString() + "\n" );
