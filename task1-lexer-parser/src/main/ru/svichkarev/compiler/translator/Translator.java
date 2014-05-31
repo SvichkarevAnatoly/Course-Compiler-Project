@@ -171,11 +171,12 @@ public class Translator {
             translateCommand( command, tv, tf, functionName );
         }
 
-        // TODO: подсчёт размера стека
+        // подсчёт размера стека
+        int stackSize = tv.getMaxLocalsShift() * 4;
         // подсчёт размера памяти под локальные переменные
         try {
             writer.write(
-                    "   .limit stack 100\n" +
+                    "   .limit stack " + stackSize + "\n" +
                     "   .limit locals " + tv.getMaxLocalsShift() + "\n"
             );
         } catch (IOException e) {
@@ -504,6 +505,9 @@ public class Translator {
                     Node command = iterator.next();
                     translateCommand( command, tvWhile, tf, curFuncName );
                 }
+
+                // обновление максимума
+                tv.updateLocalSpace( tvWhile.getMaxLocalsShift() );
 
                 // вставка конца
                 try {
