@@ -263,7 +263,17 @@ public class Translator {
 
                     throw new RuntimeException( "TR: Недопустимое приведение: double к int" );
                 }
-                // TODO: организовать приведение int к double
+
+                // приведение int к double, если надо
+                if( exprType == VariableInfo.VariableType.INT &&
+                        tv.getType(varName) == VariableInfo.VariableType.DOUBLE ){
+
+                    try {
+                        tmpWriter.write( "   i2d\n" );
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                }
 
                 // выполнить присвоение( снять со стека значение и положить в переменную )
                 try {
@@ -316,14 +326,20 @@ public class Translator {
             case PRINT:
                 // TODO: разница с append
                 // TODO: сделать такую же обёртку для вызовов функции, как и у переменных
-                // TODO: проверка правильной по типу println
+
                 varName = (String) operands.get(1).getTokenValue();
                 try {
                     tmpWriter.write(
                             "   getstatic java/lang/System/out Ljava/io/PrintStream;\n" +
-                            tv.getStrLoad( varName ) +
-                            "   invokevirtual java/io/PrintStream/println(I)V\n"
+                            tv.getStrLoad( varName )
                     );
+
+                    // проверка правильной по типу println
+                    if( tv.getType( varName ) == VariableInfo.VariableType.INT ){
+                        tmpWriter.write( "   invokevirtual java/io/PrintStream/println(I)V\n" );
+                    } else{
+                        tmpWriter.write( "   invokevirtual java/io/PrintStream/println(D)V\n" );
+                    }
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
@@ -520,13 +536,36 @@ public class Translator {
 			exprType = translateExpr(exprNode.getChildrens().get(0), tv, tf);
             if( exprType == VariableInfo.VariableType.INT ){
                 exprType = translateExpr(exprNode.getChildrens().get(1), tv, tf);
+                if( exprType == VariableInfo.VariableType.INT ){
+                    tmpWriter.write( "   iadd\n" );
+                } else {
+                    // перевернуть, привести, обратно перевернуть
+                    tmpWriter.write(
+                            "   \n" +
+                            "   dup2_x1\n" +
+                            "   pop2\n" +
+                            "   i2d\n" +
+                            "   \n" +
+                            "   dup2_x2\n" +
+                            "   pop2\n" +
+                            "   dadd\n" +
+                            "\n"
+                    );
+                }
             } else {
-                translateExpr(exprNode.getChildrens().get(1), tv, tf);
+                exprType = translateExpr(exprNode.getChildrens().get(1), tv, tf);
+                if( exprType == VariableInfo.VariableType.INT ){
+                    // привести int к double
+                    tmpWriter.write(
+                            "   i2d\n" +
+                            "   dadd\n"
+                    );
+                    exprType = VariableInfo.VariableType.DOUBLE;
+                } else{
+                    tmpWriter.write( "   dadd\n" );
+                }
             }
-
-            // TODO: команда для нужного типа
             // TODO: сделать обёртку для строкового представления команд
-			tmpWriter.write( "   iadd\n" );
 
             return exprType;
 		case MINUS:
@@ -565,9 +604,17 @@ public class Translator {
 			return exprType;
         // TODO: нужно конкретно определить тип
 		case NUMBER:
-			//range -32768 to 32767
-			tmpWriter.write( "   sipush " + exprNode.getValue().getTokenValue().toString() + "\n" );
-			// TODO: исправить определение типа
+            // определение типа
+            double val = Double.parseDouble(exprNode.getValue().getTokenValue().toString());
+            if( val == (int)val ){ // TODO: странное определение типа
+                // тогда intf
+                //range -32768 to 32767
+                tmpWriter.write( "   sipush " + exprNode.getValue().getTokenValue().toString() + "\n" );
+            } else{
+                tmpWriter.write( "   ldc2_w " + exprNode.getValue().getTokenValue().toString() + "\n" );
+                exprType = VariableInfo.VariableType.DOUBLE;
+            }
+
 			return exprType;
         case NAME:
             String varName = (String) exprNode.getTokenValue();

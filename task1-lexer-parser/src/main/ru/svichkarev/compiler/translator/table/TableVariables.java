@@ -90,12 +90,22 @@ public class TableVariables {
             throw new RuntimeException("TR: не проинициализированная переменная");
         }
 
-        // TODO: тип переменной учесть
         int indexLocals = getLocalIndex(variableName);
-        if( indexLocals < 4 ){
-            return "   iload_" + indexLocals + "\n";
+        // тип переменной учитываем
+        if( getType( variableName ) == VariableInfo.VariableType.INT ){
+            // TODO: константу в константы
+            if( indexLocals < 4 ){
+                return "   iload_" + indexLocals + "\n";
+            } else{
+                return "   iload " + indexLocals + "\n";
+            }
         } else{
-            return "   iload " + indexLocals + "\n";
+            // TODO: константу в константы
+            if( indexLocals < 4 ){
+                return "   dload_" + indexLocals + "\n";
+            } else{
+                return "   dload " + indexLocals + "\n";
+            }
         }
     }
 
@@ -106,13 +116,22 @@ public class TableVariables {
             throw new RuntimeException("TR: не объявлена переменная");
         }
 
-        // TODO: тип переменной учесть
         int indexLocals = getLocalIndex(variableName);
-        // TODO: константу в константы
-        if( indexLocals < 4 ){
-            return "   istore_" + indexLocals + "\n";
+        // тип переменной учитываем
+        if( getType( variableName ) == VariableInfo.VariableType.INT ){
+            // TODO: константу в константы
+            if( indexLocals < 4 ){
+                return "   istore_" + indexLocals + "\n";
+            } else{
+                return "   istore " + indexLocals + "\n";
+            }
         } else{
-            return "   istore " + indexLocals + "\n";
+            // TODO: константу в константы
+            if( indexLocals < 4 ){
+                return "   dstore_" + indexLocals + "\n";
+            } else{
+                return "   dstore " + indexLocals + "\n";
+            }
         }
     }
 
